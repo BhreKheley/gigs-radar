@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Musisi — {{ band.nama_band }} | Gigs Radar{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto space-y-8">
+    <!-- Header with Quick Action -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <span class="text-xs uppercase tracking-widest text-stage-gold font-bold">Pusat Kendali Musisi</span>
+            <h1 class="text-3xl md:text-4xl font-extrabold font-display text-slate-900 dark:text-white">
+                Dashboard Band: {{ band.nama_band }}
+            </h1>
+            <p class="text-xs text-slate-400 mt-1">
+                Kelola status live, jadwal panggung, dan pantau kurva pertumbuhan audiens terverifikasi.
+            </p>
+        </div>
+
+        <div class="flex items-center gap-2.5">
+            <a href="{% url 'buat_gig' %}" class="btn-stage px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-stage-gold/20">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Jadwalkan Gig Baru
+            </a>
+            <a href="{% url 'profil_band' %}" class="px-3.5 py-2.5 rounded-xl text-xs font-bold border border-white/20 hover:border-stage-gold text-slate-300 hover:text-stage-gold transition-all">
+                Edit Profil
+            </a>
+        </div>
+    </div>
+
+    <!-- 4 KPI Metrics Bar -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="p-5 rounded-2xl glass-panel border border-white/10 space-y-1">
+            <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Total Penampilan</span>
+            <div class="text-3xl font-extrabold font-display text-slate-100">{{ total_gigs }}</div>
+            <span class="text-[11px] text-slate-500">Panggung di Depok</span>
+        </div>
+
+        <div class="p-5 rounded-2xl glass-panel border border-white/10 space-y-1">
+            <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Total Audiens Hadir</span>
+            <div class="text-3xl font-extrabold font-display text-stage-gold">{{ total_penonton }}</div>
+            <span class="text-[11px] text-slate-500">Check-in fisik terverifikasi</span>
+        </div>
+
+        <div class="p-5 rounded-2xl glass-panel border border-white/10 space-y-1">
+            <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Basis Pengikut</span>
+            <div class="text-3xl font-extrabold font-display text-sky-400">{{ band.followers.count }}</div>
+            <span class="text-[11px] text-slate-500">Akun penonton setia</span>
+        </div>
+
+        <div class="p-5 rounded-2xl glass-panel border border-white/10 space-y-1">
+            <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Skor Bayesian</span>
+            <div class="text-3xl font-extrabold font-display text-emerald-400">{{ band.skor_popularitas|floatformat:2 }}</div>
+            <span class="text-[11px] text-slate-500">Algoritma anti-bias DDP1</span>
+        </div>
+    </div>
+
+    <!-- Chart.js Analitik Kehadiran Penonton -->
+    <div class="glass-panel p-6 rounded-2xl border border-white/10 space-y-4">
+        <div class="flex items-center justify-between">
+            <div class="space-y-0.5">
+                <h3 class="text-base font-bold font-display text-slate-100">Tren Kehadiran Fisik Penonton (7 Gig Terakhir)</h3>
+                <p class="text-xs text-slate-400">Jumlah audiens yang sukses check-in via GPS 150m pada tiap acara.</p>
+            </div>
+        </div>
+        <div class="w-full h-64">
+            <canvas id="audienceChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Active Gigs & Live Management Table -->
+    <div class="glass-panel rounded-2xl border border-white/10 overflow-hidden space-y-0">
+        <div class="p-5 border-b border-white/10 flex items-center justify-between">
+            <h3 class="text-base font-bold font-display text-slate-100">Daftar Jadwal & Status Panggung Band</h3>
+            <span class="text-xs text-slate-400 font-medium">{{ gigs.count }} Jadwal Terdaftar</span>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-300">
+                <thead class="text-xs uppercase tracking-wider text-slate-400 bg-white/5 border-b border-white/10">
+                    <tr>
+                        <th class="px-6 py-3.5">Judul Penampilan</th>
+                        <th class="px-6 py-3.5">Venue</th>
+                        <th class="px-6 py-3.5">Waktu</th>
+                        <th class="px-6 py-3.5 text-center">Status</th>
+                        <th class="px-6 py-3.5 text-center">Penonton</th>
+                        <th class="px-6 py-3.5 text-right">Aksi Panggung</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                    {% for g in gigs %}
+                    <tr class="hover:bg-white/[0.02] transition-colors">
+                        <td class="px-6 py-4">
+                            <a href="{% url 'gig_detail' g.id %}" class="font-bold text-slate-100 hover:text-stage-gold transition-colors block">
+                                {{ g.judul_acara }}
+                            </a>
+                            <span class="text-[11px] text-slate-500">ID: #{{ g.id }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-xs text-slate-300">
+                            {{ g.venue.nama }}
+                        </td>
+                        <td class="px-6 py-4 text-xs">
+                            <div class="font-semibold text-slate-200">{{ g.mulai|date:"d M Y" }}</div>
+                            <div class="text-[11px] text-slate-400">{{ g.mulai|date:"H:i" }} - {{ g.selesai|date:"H:i" }} WIB</div>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            {% if g.sedang_live %}
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-stage-crimson/20 border border-stage-crimson text-stage-crimson animate-pulse">
+                                LIVE
+                            </span>
+                            {% elif g.status_efektif == 'TERJADWAL' %}
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-stage-gold/15 border border-stage-gold/30 text-stage-gold">
+                                Terjadwal
+                            </span>
+                            {% else %}
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-slate-500/15 border border-slate-500/30 text-slate-400">
+                                Selesai
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-center text-xs font-bold text-slate-200">
+                            {{ g.checkins.count }}
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                {% if g.sedang_live %}
+                                <!-- Extend +30m Form -->
+                                {% if not g.sudah_diperpanjang %}
+                                <form action="{% url 'extend_gig' g.id %}" method="post" class="inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="aksi" value="perpanjang">
+                                    <button type="submit" class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/40 transition-colors">
+                                        +30 Menit
+                                    </button>
+                                </form>
+                                {% endif %}
+
+                                <!-- Akhiri Panggung Form -->
+                                <form action="{% url 'extend_gig' g.id %}" method="post" class="inline" onsubmit="return confirm('Akhiri panggung sekarang?')">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="aksi" value="akhiri">
+                                    <button type="submit" class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 border border-rose-500/40 transition-colors">
+                                        Tutup Gig
+                                    </button>
+                                </form>
+                                {% elif g.status_efektif == 'TERJADWAL' %}
+                                <button type="button" onclick="triggerGoLive({{ g.id }}, {{ g.venue.latitude }}, {{ g.venue.longitude }})" class="btn-stage px-3 py-1.5 rounded-lg text-[11px] font-bold flex items-center gap-1 shadow-sm">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/></svg>
+                                    Go Live GPS
+                                </button>
+                                {% endif %}
+
+                                <a href="{% url 'gig_detail' g.id %}" class="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold border border-white/10 hover:border-white/30 text-slate-400 hover:text-white transition-colors">
+                                    Detail
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-10 text-center text-xs text-slate-500 space-y-2">
+                            <div>Belum ada jadwal gig yang Anda terbitkan.</div>
+                            <a href="{% url 'buat_gig' %}" class="inline-block btn-stage px-4 py-2 rounded-lg text-xs font-bold">
+                                Jadwalkan Gig Pertama Sekarang
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+// 1. Chart.js Inisialisasi
+document.addEventListener('DOMContentLoaded', () => {
+    const ctx = document.getElementById('audienceChart');
+    if (ctx) {
+        const labels = {{ chart_labels|safe }};
+        const data = {{ chart_data|safe }};
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels.length > 0 ? labels : ['Belum ada gig'],
+                datasets: [{
+                    label: 'Audiens Check-in Terverifikasi',
+                    data: data.length > 0 ? data : [0],
+                    borderColor: '#F59E0B',
+                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                    borderWidth: 2.5,
+                    fill: true,
+                    tension: 0.35,
+                    pointBackgroundColor: '#F59E0B',
+                    pointBorderColor: '#000',
+                    pointBorderWidth: 2,
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: { color: '#94A3B8', font: { size: 11 } }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: {
+                            precision: 0,
+                            color: '#94A3B8',
+                            font: { size: 11 }
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+
+// 2. Go Live GPS Geofence Function
+function triggerGoLive(gigId, venueLat, venueLng) {
+    if (!navigator.geolocation) {
+        showToast('Browser Anda tidak mendukung geolokasi GPS.', 'error');
+        return;
+    }
+
+    showToast('Mendeteksi GPS musisi untuk verifikasi venue...', 'info');
+
+    navigator.geolocation.getCurrentPosition(
+        (pos) => {
+            const uLat = pos.coords.latitude;
+            const uLng = pos.coords.longitude;
+            const acc = pos.coords.accuracy || 0;
+
+            fetch(`/gig/${gigId}/golive/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    latitude: uLat,
+                    longitude: uLng,
+                    accuracy: acc
+                })
+            })
+            .then(r => r.json())
+            .then(res => {
+                if (res.status === 'ok') {
+                    showToast(res.pesan, 'success');
+                    setTimeout(() => window.location.reload(), 1200);
+                } else {
+                    showToast(res.pesan || 'Verifikasi geofence gagal.', 'error');
+                }
+            })
+            .catch(() => showToast('Gagal menghubungi server.', 'error'));
+        },
+        (err) => {
+            showToast('Izin lokasi ditolak. Aktifkan GPS untuk Go Live.', 'error');
+        },
+        { enableHighAccuracy: true, timeout: 8000 }
+    );
+}
+</script>
+{% endblock %}

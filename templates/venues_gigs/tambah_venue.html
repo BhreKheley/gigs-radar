@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}Pendaftaran Venue Panggung Baru | Gigs Radar{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-8">
+    <!-- Header -->
+    <div class="space-y-2">
+        <a href="{% url 'buat_gig' %}" class="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-stage-gold transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            Kembali ke Buat Gig
+        </a>
+        <h1 class="text-3xl font-extrabold font-display text-slate-900 dark:text-white">Pendaftaran Titik Venue Panggung</h1>
+        <p class="text-sm text-slate-400">
+            Daftarkan titik kafe, kedai kopi, atau ruang publik pertunjukan musik di Depok dengan penempatan pin geospasial presisi.
+        </p>
+    </div>
+
+    <!-- Peringatan Deteksi Duplikasi Spasial 50 Meter -->
+    {% if venue_duplikat %}
+    <div class="p-5 rounded-2xl bg-amber-500/15 border border-amber-500/40 text-amber-200 space-y-3">
+        <div class="flex items-center gap-2 text-sm font-bold text-amber-400">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            Peringatan: Terdeteksi Venue Mirip Dalam Radius Dekat ({{ jarak_duplikat }} meter)
+        </div>
+        <p class="text-xs leading-relaxed text-amber-100">
+            Sistem mendeteksi bahwa lokasi koordinat yang Anda masukkan hanya berjarak <strong>{{ jarak_duplikat }} meter</strong> dari venue yang sudah terdaftar sebelumnya:
+            <strong class="text-white">"{{ venue_duplikat.nama }}"</strong> ({{ venue_duplikat.alamat }}).
+        </p>
+        <div class="text-xs text-amber-200">
+            Jika ini adalah tempat yang sama, silakan gunakan venue tersebut pada form penjadwalan. Jika ini memang venue yang berbeda (misalnya kafe berbeda di ruko berdampingan), centang kotak konfirmasi di bawah formulir untuk tetap menyimpan.
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Left: Form Input -->
+        <div class="lg:col-span-6 space-y-6">
+            <div class="glass-panel p-6 rounded-2xl border border-white/10 space-y-5">
+                <form method="post" id="venue-form" class="space-y-4">
+                    {% csrf_token %}
+
+                    <div class="space-y-1">
+                        <label for="{{ form.nama.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-slate-300">
+                            Nama Venue / Kafe <span class="text-stage-crimson">*</span>
+                        </label>
+                        {{ form.nama }}
+                        {% if form.nama.errors %}<p class="text-xs text-stage-crimson">{{ form.nama.errors.0 }}</p>{% endif %}
+                    </div>
+
+                    <div class="space-y-1">
+                        <label for="{{ form.alamat.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-slate-300">
+                            Alamat Lengkap <span class="text-stage-crimson">*</span>
+                        </label>
+                        {{ form.alamat }}
+                        {% if form.alamat.errors %}<p class="text-xs text-stage-crimson">{{ form.alamat.errors.0 }}</p>{% endif %}
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="space-y-1">
+                            <label for="{{ form.latitude.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-slate-300">
+                                Lintang (Lat) <span class="text-stage-crimson">*</span>
+                            </label>
+                            {{ form.latitude }}
+                            {% if form.latitude.errors %}<p class="text-xs text-stage-crimson">{{ form.latitude.errors.0 }}</p>{% endif %}
+                        </div>
+                        <div class="space-y-1">
+                            <label for="{{ form.longitude.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-slate-300">
+                                Bujur (Lng) <span class="text-stage-crimson">*</span>
+                            </label>
+                            {{ form.longitude }}
+                            {% if form.longitude.errors %}<p class="text-xs text-stage-crimson">{{ form.longitude.errors.0 }}</p>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label for="{{ form.kontak.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-slate-300">
+                            Kontak / Instagram Venue (Opsional)
+                        </label>
+                        {{ form.kontak }}
+                        {% if form.kontak.errors %}<p class="text-xs text-stage-crimson">{{ form.kontak.errors.0 }}</p>{% endif %}
+                    </div>
+
+                    {% if venue_duplikat %}
+                    <div class="pt-2">
+                        <label class="flex items-start gap-2.5 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 cursor-pointer">
+                            <input type="checkbox" name="konfirmasi_duplikat" value="1" class="mt-0.5 rounded border-amber-500 text-stage-gold focus:ring-0">
+                            <span class="text-xs text-amber-200">
+                                Ya, saya mengonfirmasi ini adalah entitas tempat yang berbeda meskipun berjarak kurang dari 50 meter.
+                            </span>
+                        </label>
+                    </div>
+                    {% endif %}
+
+                    <div class="pt-4 border-t border-white/10 flex items-center justify-end gap-3">
+                        <button type="submit" class="w-full btn-stage py-2.5 rounded-xl text-xs font-bold">
+                            Simpan Titik Venue
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Right: Interactive Pin Dropper Map -->
+        <div class="lg:col-span-6 space-y-4">
+            <div class="glass-panel p-5 rounded-2xl border border-white/10 space-y-3">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-100">Klik Peta untuk Menentukan Posisi</h3>
+                        <p class="text-[11px] text-slate-400">Klik titik mana pun pada peta untuk mengisi otomatis Lintang & Bujur.</p>
+                    </div>
+                    <button id="btn-my-loc" type="button" class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold border border-white/20 hover:border-stage-gold text-slate-300 hover:text-stage-gold transition-colors flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+                        Posisi Saya
+                    </button>
+                </div>
+
+                <div id="picker-map" class="w-full h-80 rounded-xl border border-white/10 overflow-hidden z-10"></div>
+
+                <!-- Live Duplication Check Toast Indicator -->
+                <div id="dedup-indicator" class="hidden p-3 rounded-xl text-xs space-y-1"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const latInput = document.getElementById('{{ form.latitude.id_for_label }}');
+    const lngInput = document.getElementById('{{ form.longitude.id_for_label }}');
+    const dedupIndicator = document.getElementById('dedup-indicator');
+
+    // Default Depok Margonda
+    let curLat = parseFloat(latInput.value) || -6.3645;
+    let curLng = parseFloat(lngInput.value) || 106.8242;
+
+    const map = L.map('picker-map').setView([curLat, curLng], 14);
+
+    const isDark = document.documentElement.classList.contains('dark');
+    const tileUrl = isDark
+        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+        : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+
+    L.tileLayer(tileUrl, { maxZoom: 19 }).addTo(map);
+
+    const markerIcon = L.divIcon({
+        className: 'picker-pin',
+        html: `<div style="background-color: #F59E0B; width: 28px; height: 28px; border-radius: 50%; border: 3px solid #000; display:flex; align-items:center; justify-content:center; box-shadow:0 0 15px rgba(245,158,11,0.7);">
+                <div style="background-color: #000; width: 8px; height: 8px; border-radius: 50%;"></div>
+               </div>`,
+        iconSize: [28, 28],
+        iconAnchor: [14, 14]
+    });
+
+    let marker = L.marker([curLat, curLng], { icon: markerIcon, draggable: true }).addTo(map);
+
+    function checkDuplication(lat, lng) {
+        fetch(`{% url 'api_cek_duplikat_venue' %}?lat=${lat}&lng=${lng}`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.duplikat && data.duplikat.length > 0) {
+                    const d = data.duplikat[0];
+                    dedupIndicator.className = 'p-3 rounded-xl text-xs bg-amber-500/15 border border-amber-500/40 text-amber-200 block';
+                    dedupIndicator.innerHTML = `<strong>Peringatan Spasial 50m:</strong> Lokasi berdekatan (${d.jarak_m}m) dengan venue "<strong>${d.nama}</strong>".`;
+                } else {
+                    dedupIndicator.className = 'p-3 rounded-xl text-xs bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 block';
+                    dedupIndicator.innerHTML = `<strong>Aman:</strong> Tidak ada duplikasi venue lain dalam radius 50 meter.`;
+                }
+            })
+            .catch(() => {
+                dedupIndicator.className = 'hidden';
+            });
+    }
+
+    function setCoordinates(lat, lng) {
+        latInput.value = lat.toFixed(6);
+        lngInput.value = lng.toFixed(6);
+        marker.setLatLng([lat, lng]);
+        checkDuplication(lat, lng);
+    }
+
+    map.on('click', (e) => {
+        setCoordinates(e.latlng.lat, e.latlng.lng);
+    });
+
+    marker.on('dragend', () => {
+        const pos = marker.getLatLng();
+        setCoordinates(pos.lat, pos.lng);
+    });
+
+    // Tombol Posisi Saya
+    const btnMyLoc = document.getElementById('btn-my-loc');
+    if (btnMyLoc) {
+        btnMyLoc.addEventListener('click', () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((pos) => {
+                    const uLat = pos.coords.latitude;
+                    const uLng = pos.coords.longitude;
+                    map.setView([uLat, uLng], 16);
+                    setCoordinates(uLat, uLng);
+                    showToast('Koordinat GPS Anda diterapkan.', 'success');
+                }, () => {
+                    showToast('Gagal mengakses GPS.', 'error');
+                });
+            }
+        });
+    }
+
+    // Inisialisasi pengecekan pertama
+    if (latInput.value && lngInput.value) {
+        checkDuplication(parseFloat(latInput.value), parseFloat(lngInput.value));
+    }
+});
+</script>
+{% endblock %}

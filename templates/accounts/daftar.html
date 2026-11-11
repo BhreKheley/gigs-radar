@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Daftar Akun Baru — Gigs Radar{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto py-6 space-y-6">
+    <!-- Header -->
+    <div class="text-center space-y-2">
+        <h1 class="text-2xl md:text-3xl font-extrabold font-display text-slate-900 dark:text-white">Registrasi Akun Gigs Radar</h1>
+        <p class="text-xs text-slate-400">
+            Bergabunglah dengan ekosistem live music Depok sebagai penonton atau musisi panggung.
+        </p>
+    </div>
+
+    <!-- Registration Card -->
+    <div class="glass-panel p-6 md:p-8 rounded-2xl border border-white/10 space-y-6">
+        <form method="post" class="space-y-5" id="register-form">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="p-3.5 rounded-xl bg-stage-crimson/15 border border-stage-crimson/40 text-xs text-rose-300">
+                {{ form.non_field_errors.0 }}
+            </div>
+            {% endif %}
+
+            <!-- Role Selector Custom Tabs -->
+            <div class="space-y-2">
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-300">
+                    Pilih Peran Akun Anda <span class="text-stage-crimson">*</span>
+                </label>
+                <div class="grid grid-cols-2 gap-3 p-1.5 rounded-xl bg-black/40 border border-white/10">
+                    <label id="tab-pengunjung" class="flex flex-col items-center justify-center p-3 rounded-lg cursor-pointer border transition-all bg-white/10 border-stage-gold/50 text-white">
+                        <input type="radio" name="role" value="pengunjung" class="sr-only" checked onchange="handleRoleSwitch('pengunjung')">
+                        <span class="text-xs font-bold">Penonton / Audiens</span>
+                        <span class="text-[10px] text-slate-400 text-center mt-0.5">Pantau radar, check-in, beri rating</span>
+                    </label>
+
+                    <label id="tab-band" class="flex flex-col items-center justify-center p-3 rounded-lg cursor-pointer border transition-all border-transparent text-slate-400 hover:text-white">
+                        <input type="radio" name="role" value="band" class="sr-only" onchange="handleRoleSwitch('band')">
+                        <span class="text-xs font-bold">Musisi / Band</span>
+                        <span class="text-[10px] text-slate-400 text-center mt-0.5">Jadwalkan gig, Go-Live GPS, analitik</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Username -->
+            <div class="space-y-1">
+                <label for="{{ form.username.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-slate-300">
+                    Nama Pengguna (Username) <span class="text-stage-crimson">*</span>
+                </label>
+                {{ form.username }}
+                {% if form.username.errors %}<p class="text-xs text-stage-crimson">{{ form.username.errors.0 }}</p>{% endif %}
+            </div>
+
+            <!-- Email -->
+            <div class="space-y-1">
+                <label for="{{ form.email.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-slate-300">
+                    Alamat Email (Opsional)
+                </label>
+                {{ form.email }}
+                {% if form.email.errors %}<p class="text-xs text-stage-crimson">{{ form.email.errors.0 }}</p>{% endif %}
+            </div>
+
+            <!-- Password & Confirmation -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="space-y-1">
+                    <label for="{{ form.password.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-slate-300">
+                        Kata Sandi <span class="text-stage-crimson">*</span>
+                    </label>
+                    {{ form.password }}
+                    {% if form.password.errors %}<p class="text-xs text-stage-crimson">{{ form.password.errors.0 }}</p>{% endif %}
+                </div>
+                <div class="space-y-1">
+                    <label for="{{ form.password_konfirmasi.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-slate-300">
+                        Ulangi Sandi <span class="text-stage-crimson">*</span>
+                    </label>
+                    {{ form.password_konfirmasi }}
+                    {% if form.password_konfirmasi.errors %}<p class="text-xs text-stage-crimson">{{ form.password_konfirmasi.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+
+            <!-- Conditional Section: Band Profile Fields -->
+            <div id="band-fields" class="hidden p-4 rounded-xl bg-white/5 border border-stage-gold/30 space-y-4">
+                <div class="flex items-center gap-2 text-xs font-bold text-stage-gold">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
+                    Informasi Profil Panggung Musisi
+                </div>
+
+                <div class="space-y-1">
+                    <label for="{{ form.nama_band.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-slate-300">
+                        Nama Panggung / Band <span class="text-stage-crimson">*</span>
+                    </label>
+                    {{ form.nama_band }}
+                    {% if form.nama_band.errors %}<p class="text-xs text-stage-crimson">{{ form.nama_band.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="space-y-1">
+                        <label for="{{ form.genre.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-slate-300">
+                            Genre Musik Utama
+                        </label>
+                        {{ form.genre }}
+                    </div>
+                    <div class="space-y-1">
+                        <label for="{{ form.kontak_ig.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-slate-300">
+                            Akun Instagram Band
+                        </label>
+                        {{ form.kontak_ig }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="w-full btn-stage py-3 rounded-xl text-xs font-bold shadow-lg shadow-stage-gold/20 mt-2">
+                Daftar Akun Sekarang
+            </button>
+        </form>
+
+        <!-- Link to Login -->
+        <div class="text-center text-xs text-slate-400 pt-3 border-t border-white/10">
+            Sudah memiliki akun?
+            <a href="{% url 'masuk' %}" class="font-bold text-stage-gold hover:underline ml-1">Masuk di sini</a>
+        </div>
+    </div>
+</div>
+
+<script>
+function handleRoleSwitch(role) {
+    const tabPengunjung = document.getElementById('tab-pengunjung');
+    const tabBand = document.getElementById('tab-band');
+    const bandFields = document.getElementById('band-fields');
+
+    if (role === 'band') {
+        tabBand.className = 'flex flex-col items-center justify-center p-3 rounded-lg cursor-pointer border transition-all bg-white/10 border-stage-gold/50 text-white';
+        tabPengunjung.className = 'flex flex-col items-center justify-center p-3 rounded-lg cursor-pointer border transition-all border-transparent text-slate-400 hover:text-white';
+        bandFields.classList.remove('hidden');
+    } else {
+        tabPengunjung.className = 'flex flex-col items-center justify-center p-3 rounded-lg cursor-pointer border transition-all bg-white/10 border-stage-gold/50 text-white';
+        tabBand.className = 'flex flex-col items-center justify-center p-3 rounded-lg cursor-pointer border transition-all border-transparent text-slate-400 hover:text-white';
+        bandFields.classList.add('hidden');
+    }
+}
+
+// Inisialisasi sesuai radio value yang tercentang saat ini (misal validasi ulang)
+document.addEventListener('DOMContentLoaded', () => {
+    const checkedRadio = document.querySelector('input[name="role"]:checked');
+    if (checkedRadio) {
+        handleRoleSwitch(checkedRadio.value);
+    }
+});
+</script>
+{% endblock %}

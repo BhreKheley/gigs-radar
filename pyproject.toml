@@ -1,0 +1,14 @@
+[project]
+name = "gigs-radar"
+version = "1.0.0"
+description = "Hyperlocal Real-Time Live Music Discovery & Event Tracker Platform (DDP1 Final Project & Xplor.in Architecture)"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "django>=5.0,<6.0",
+    "pillow>=10.0",
+    "whitenoise>=6.6.0",
+    "gunicorn>=21.2.0",
+    "dj-database-url>=2.1.0",
+]
+

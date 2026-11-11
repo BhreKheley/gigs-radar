@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Pengaturan Profil Band — {{ profil.nama_band }} | Gigs Radar{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-8">
+    <!-- Header -->
+    <div class="space-y-2">
+        <div class="flex items-center justify-between">
+            <h1 class="text-3xl font-extrabold font-display text-slate-900 dark:text-white">Pengaturan Profil Musisi</h1>
+            <a href="{% url 'band_detail' profil.slug %}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border border-white/20 hover:border-stage-gold text-slate-300 hover:text-stage-gold transition-all">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                Lihat Tampilan Publik
+            </a>
+        </div>
+        <p class="text-sm text-slate-400">
+            Perbarui identitas, genre, bio panggung, dan media sosial grup musik Anda.
+        </p>
+    </div>
+
+    <!-- Quick Stats Metric Bar -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="p-4 rounded-xl glass-panel border border-white/10 space-y-1">
+            <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Total Pengikut</span>
+            <div class="text-2xl font-extrabold font-display text-stage-gold">{{ profil.followers.count }}</div>
+        </div>
+        <div class="p-4 rounded-xl glass-panel border border-white/10 space-y-1">
+            <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Penampilan Gig</span>
+            <div class="text-2xl font-extrabold font-display text-slate-100">{{ profil.gigs.count }}</div>
+        </div>
+        <div class="p-4 rounded-xl glass-panel border border-white/10 space-y-1">
+            <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Skor Bayesian</span>
+            <div class="text-2xl font-extrabold font-display text-emerald-400">{{ profil.skor_popularitas|floatformat:2 }}</div>
+        </div>
+    </div>
+
+    <!-- Edit Form Card -->
+    <div class="glass-panel p-6 md:p-8 rounded-2xl border border-white/10 space-y-6">
+        <form method="post" enctype="multipart/form-data" class="space-y-5">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="p-3.5 rounded-xl bg-stage-crimson/15 border border-stage-crimson/40 text-xs text-rose-300">
+                {{ form.non_field_errors.0 }}
+            </div>
+            {% endif %}
+
+            <div class="space-y-1">
+                <label for="{{ form.nama_band.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-slate-300">
+                    Nama Panggung / Band <span class="text-stage-crimson">*</span>
+                </label>
+                {{ form.nama_band }}
+                {% if form.nama_band.errors %}<p class="text-xs text-stage-crimson">{{ form.nama_band.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                    <label for="{{ form.genre.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-slate-300">
+                        Genre Musik
+                    </label>
+                    {{ form.genre }}
+                    {% if form.genre.errors %}<p class="text-xs text-stage-crimson">{{ form.genre.errors.0 }}</p>{% endif %}
+                </div>
+                <div class="space-y-1">
+                    <label for="{{ form.kontak_ig.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-slate-300">
+                        Instagram Handle
+                    </label>
+                    {{ form.kontak_ig }}
+                    {% if form.kontak_ig.errors %}<p class="text-xs text-stage-crimson">{{ form.kontak_ig.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+
+            <div class="space-y-1">
+                <label for="{{ form.deskripsi.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-slate-300">
+                    Biografi / Cerita Musisi
+                </label>
+                {{ form.deskripsi }}
+                {% if form.deskripsi.errors %}<p class="text-xs text-stage-crimson">{{ form.deskripsi.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="space-y-2">
+                <label for="{{ form.foto.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-slate-300">
+                    Foto Profil / Press Kit Musisi
+                </label>
+                {% if profil.foto %}
+                <div class="flex items-center gap-4 p-3 rounded-xl bg-white/5 border border-white/10 mb-2">
+                    <img src="{{ profil.foto.url }}" alt="{{ profil.nama_band }}" class="w-16 h-16 rounded-lg object-cover border border-white/20">
+                    <span class="text-xs text-slate-400">Foto aktif saat ini</span>
+                </div>
+                {% endif %}
+                {{ form.foto }}
+                {% if form.foto.errors %}<p class="text-xs text-stage-crimson">{{ form.foto.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="pt-4 border-t border-white/10 flex items-center justify-end gap-3">
+                <button type="submit" class="btn-stage px-6 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2">
+                    Simpan Perubahan Profil
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

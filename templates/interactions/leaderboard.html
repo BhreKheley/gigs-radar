@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}Papan Peringkat Musisi Depok (Bayesian Leaderboard) | Gigs Radar{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto space-y-10">
+    <!-- Header -->
+    <div class="text-center space-y-3">
+        <span class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-widest bg-stage-gold/10 border border-stage-gold/30 text-stage-gold">
+            Algoritma Bayesian + Logaritma Pengikut
+        </span>
+        <h1 class="text-3xl md:text-5xl font-extrabold font-display text-slate-900 dark:text-white tracking-tight">
+            Papan Peringkat Musisi Depok
+        </h1>
+        <p class="text-sm md:text-base text-slate-400 max-w-2xl mx-auto">
+            Peringkat dihitung secara objektif dari kombinasi ulasan audiens terverifikasi fisik di venue panggung dan loyalitas basis pengikut.
+        </p>
+    </div>
+
+    <!-- Podium Visual Top 3 -->
+    {% if podium_top3 %}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end pt-4">
+        <!-- Juara 2 (Perak) -->
+        {% if podium_top3|length >= 2 %}
+        {% with b2=podium_top3.1 %}
+        <div class="glass-panel p-6 rounded-2xl border border-slate-400/20 text-center space-y-4 order-2 md:order-1 transform hover:-translate-y-1 transition-all">
+            <div class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-slate-400/20 text-slate-300 font-display font-extrabold text-lg border border-slate-400/30 mx-auto">
+                2
+            </div>
+            <div class="w-20 h-20 rounded-2xl bg-slate-800 border border-slate-400/40 mx-auto flex items-center justify-center font-display font-extrabold text-2xl text-slate-300">
+                {{ b2.band.nama_band|slice:":2"|upper }}
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-slate-100 hover:text-stage-gold transition-colors">
+                    <a href="{% url 'band_detail' b2.band.slug %}">{{ b2.band.nama_band }}</a>
+                </h3>
+                <span class="text-xs text-slate-400 font-medium">{{ b2.band.genre }}</span>
+            </div>
+            <div class="p-3 rounded-xl bg-white/5 border border-white/5 space-y-1">
+                <div class="text-2xl font-extrabold font-display text-slate-200">{{ b2.skor|floatformat:2 }}</div>
+                <div class="text-[11px] text-slate-400">{{ b2.total_ulasan }} ulasan • {{ b2.total_pengikut }} pengikut</div>
+            </div>
+        </div>
+        {% endwith %}
+        {% endif %}
+
+        <!-- Juara 1 (Emas / Puncak) -->
+        {% with b1=podium_top3.0 %}
+        <div class="glass-panel p-8 rounded-3xl border-2 border-stage-gold text-center space-y-5 order-1 md:order-2 shadow-2xl shadow-stage-gold/15 transform md:-translate-y-4 hover:-translate-y-5 transition-all relative">
+            <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-extrabold uppercase tracking-widest bg-stage-gold text-black shadow-lg">
+                Peringkat 1
+            </div>
+            <div class="w-24 h-24 rounded-2xl bg-gradient-to-tr from-stage-gold to-stage-amber border-2 border-stage-gold mx-auto flex items-center justify-center font-display font-extrabold text-3xl text-black shadow-xl">
+                {{ b1.band.nama_band|slice:":2"|upper }}
+            </div>
+            <div>
+                <h2 class="text-2xl font-extrabold font-display text-slate-900 dark:text-white hover:text-stage-gold transition-colors">
+                    <a href="{% url 'band_detail' b1.band.slug %}">{{ b1.band.nama_band }}</a>
+                </h2>
+                <span class="text-xs text-stage-gold font-semibold uppercase tracking-wider">{{ b1.band.genre }}</span>
+            </div>
+            <div class="p-4 rounded-xl bg-stage-gold/10 border border-stage-gold/30 space-y-1">
+                <div class="text-3xl font-extrabold font-display text-stage-gold">{{ b1.skor|floatformat:2 }}</div>
+                <div class="text-xs text-slate-300 font-medium">{{ b1.total_ulasan }} ulasan terverifikasi • {{ b1.total_pengikut }} pengikut</div>
+            </div>
+        </div>
+        {% endwith %}
+
+        <!-- Juara 3 (Perunggu) -->
+        {% if podium_top3|length >= 3 %}
+        {% with b3=podium_top3.2 %}
+        <div class="glass-panel p-6 rounded-2xl border border-amber-700/30 text-center space-y-4 order-3 transform hover:-translate-y-1 transition-all">
+            <div class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-amber-700/20 text-amber-500 font-display font-extrabold text-lg border border-amber-700/40 mx-auto">
+                3
+            </div>
+            <div class="w-20 h-20 rounded-2xl bg-slate-800 border border-amber-700/40 mx-auto flex items-center justify-center font-display font-extrabold text-2xl text-amber-500">
+                {{ b3.band.nama_band|slice:":2"|upper }}
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-slate-100 hover:text-stage-gold transition-colors">
+                    <a href="{% url 'band_detail' b3.band.slug %}">{{ b3.band.nama_band }}</a>
+                </h3>
+                <span class="text-xs text-slate-400 font-medium">{{ b3.band.genre }}</span>
+            </div>
+            <div class="p-3 rounded-xl bg-white/5 border border-white/5 space-y-1">
+                <div class="text-2xl font-extrabold font-display text-amber-400">{{ b3.skor|floatformat:2 }}</div>
+                <div class="text-[11px] text-slate-400">{{ b3.total_ulasan }} ulasan • {{ b3.total_pengikut }} pengikut</div>
+            </div>
+        </div>
+        {% endwith %}
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Full Leaderboard Table -->
+    <div class="glass-panel rounded-2xl border border-white/10 overflow-hidden shadow-xl">
+        <div class="p-5 border-b border-white/10 flex items-center justify-between">
+            <h3 class="text-lg font-bold font-display text-slate-100">Daftar Lengkap Musisi</h3>
+            <span class="text-xs text-slate-400 font-semibold">{{ leaderboard|length }} Musisi Terdaftar</span>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-300">
+                <thead class="text-xs uppercase tracking-wider text-slate-400 bg-white/5 border-b border-white/10">
+                    <tr>
+                        <th class="px-6 py-4">#</th>
+                        <th class="px-6 py-4">Nama Musisi / Band</th>
+                        <th class="px-6 py-4">Genre</th>
+                        <th class="px-6 py-4 text-center">Ulasan Hadir</th>
+                        <th class="px-6 py-4 text-center">Pengikut</th>
+                        <th class="px-6 py-4 text-right">Skor Total</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                    {% for item in leaderboard %}
+                    <tr class="hover:bg-white/[0.03] transition-colors">
+                        <td class="px-6 py-4 font-display font-extrabold text-base {% if item.peringkat == 1 %}text-stage-gold{% elif item.peringkat == 2 %}text-slate-300{% elif item.peringkat == 3 %}text-amber-500{% else %}text-slate-500{% endif %}">
+                            {{ item.peringkat }}
+                        </td>
+                        <td class="px-6 py-4">
+                            <a href="{% url 'band_detail' item.band.slug %}" class="font-bold text-slate-100 hover:text-stage-gold transition-colors flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center font-bold text-xs text-stage-gold">
+                                    {{ item.band.nama_band|slice:":2"|upper }}
+                                </div>
+                                <span>{{ item.band.nama_band }}</span>
+                            </a>
+                        </td>
+                        <td class="px-6 py-4 text-xs text-slate-400">
+                            {{ item.band.genre }}
+                        </td>
+                        <td class="px-6 py-4 text-center text-xs">
+                            <span class="font-bold text-slate-200">{{ item.total_ulasan }}</span>
+                            <span class="text-slate-500 text-[11px]">({{ item.rata_rata }} ★)</span>
+                        </td>
+                        <td class="px-6 py-4 text-center text-xs text-slate-300">
+                            {{ item.total_pengikut }}
+                        </td>
+                        <td class="px-6 py-4 text-right font-display font-extrabold text-base text-stage-gold">
+                            {{ item.skor|floatformat:2 }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-8 text-center text-xs text-slate-500">
+                            Belum ada musisi terdaftar di platform.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Transparent Formula Card (Mathematical Integrity) -->
+    <div class="glass-panel p-6 rounded-2xl border border-white/10 space-y-3">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-stage-gold flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Transparansi Algoritma Bayesian & Anti-Bias
+        </h4>
+        <p class="text-xs text-slate-400 leading-relaxed">
+            Skor dihitung dengan formula matematis <code class="text-slate-200 bg-white/5 px-2 py-0.5 rounded">Skor = [(v / (v + m)) × R] + [(m / (v + m)) × C] + log10(1 + F)</code>. Musisi dengan sedikit ulasan ditarik mendekati rata-rata global platform (<code class="text-slate-200">C</code>) dengan bobot prior minimum <code class="text-slate-200">m = 5</code>, mencegah bias rating 5.0 dari 1 ulasan tunggal, diperkuat bobot logaritmik basis pengikut setia.
+        </p>
+    </div>
+</div>
+{% endblock %}
