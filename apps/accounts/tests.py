@@ -94,3 +94,4 @@ class AccountsTestCase(TestCase):
         resp = self.client.post(reverse('toggle_follow', kwargs={'slug': self.band.slug}), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(resp.status_code, 403)
         self.assertEqual(self.band.followers.count(), 0)
+

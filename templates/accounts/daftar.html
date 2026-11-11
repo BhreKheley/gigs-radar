@@ -3,7 +3,7 @@
 {% block title %}Daftar Akun Baru — Gigs Radar{% endblock %}
 
 {% block content %}
-<div class="max-w-lg mx-auto py-6 space-y-6">
+<div class="max-w-lg mx-auto px-4 sm:px-6 py-6 space-y-6">
     <!-- Header -->
     <div class="text-center space-y-2">
         <h1 class="text-2xl md:text-3xl font-extrabold font-display text-slate-900 dark:text-white">Registrasi Akun Gigs Radar</h1>
@@ -13,7 +13,7 @@
     </div>
 
     <!-- Registration Card -->
-    <div class="glass-panel p-6 md:p-8 rounded-2xl border border-white/10 space-y-6">
+    <div class="glass-panel p-5 sm:p-6 md:p-8 rounded-2xl border border-white/10 space-y-6">
         <form method="post" class="space-y-5" id="register-form">
             {% csrf_token %}
 
@@ -28,17 +28,17 @@
                 <label class="block text-xs font-bold uppercase tracking-wider text-slate-300">
                     Pilih Peran Akun Anda <span class="text-stage-crimson">*</span>
                 </label>
-                <div class="grid grid-cols-2 gap-3 p-1.5 rounded-xl bg-black/40 border border-white/10">
-                    <label id="tab-pengunjung" class="flex flex-col items-center justify-center p-3 rounded-lg cursor-pointer border transition-all bg-white/10 border-stage-gold/50 text-white">
+                <div class="grid grid-cols-2 gap-2 sm:gap-3 p-1.5 rounded-xl bg-black/40 border border-white/10">
+                    <label id="tab-pengunjung" class="flex flex-col items-center justify-center p-2.5 sm:p-3 rounded-lg cursor-pointer border transition-all bg-white/10 border-stage-gold/50 text-white min-h-[50px]">
                         <input type="radio" name="role" value="pengunjung" class="sr-only" checked onchange="handleRoleSwitch('pengunjung')">
-                        <span class="text-xs font-bold">Penonton / Audiens</span>
-                        <span class="text-[10px] text-slate-400 text-center mt-0.5">Pantau radar, check-in, beri rating</span>
+                        <span class="text-xs font-bold">Penonton</span>
+                        <span class="text-[10px] text-slate-400 text-center mt-0.5">Check-in, rating</span>
                     </label>
 
-                    <label id="tab-band" class="flex flex-col items-center justify-center p-3 rounded-lg cursor-pointer border transition-all border-transparent text-slate-400 hover:text-white">
+                    <label id="tab-band" class="flex flex-col items-center justify-center p-2.5 sm:p-3 rounded-lg cursor-pointer border transition-all border-transparent text-slate-400 hover:text-white min-h-[50px]">
                         <input type="radio" name="role" value="band" class="sr-only" onchange="handleRoleSwitch('band')">
                         <span class="text-xs font-bold">Musisi / Band</span>
-                        <span class="text-[10px] text-slate-400 text-center mt-0.5">Jadwalkan gig, Go-Live GPS, analitik</span>
+                        <span class="text-[10px] text-slate-400 text-center mt-0.5">Jadwal, Go-Live</span>
                     </label>
                 </div>
             </div>
@@ -111,7 +111,7 @@
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" class="w-full btn-stage py-3 rounded-xl text-xs font-bold shadow-lg shadow-stage-gold/20 mt-2">
+            <button type="submit" class="w-full btn-stage min-h-[46px] py-3 rounded-xl text-xs font-bold shadow-lg shadow-stage-gold/20 mt-2 flex items-center justify-center">
                 Daftar Akun Sekarang
             </button>
         </form>
@@ -131,12 +131,12 @@ function handleRoleSwitch(role) {
     const bandFields = document.getElementById('band-fields');
 
     if (role === 'band') {
-        tabBand.className = 'flex flex-col items-center justify-center p-3 rounded-lg cursor-pointer border transition-all bg-white/10 border-stage-gold/50 text-white';
-        tabPengunjung.className = 'flex flex-col items-center justify-center p-3 rounded-lg cursor-pointer border transition-all border-transparent text-slate-400 hover:text-white';
+        tabBand.className = 'flex flex-col items-center justify-center p-2.5 sm:p-3 rounded-lg cursor-pointer border transition-all bg-white/10 border-stage-gold/50 text-white min-h-[50px]';
+        tabPengunjung.className = 'flex flex-col items-center justify-center p-2.5 sm:p-3 rounded-lg cursor-pointer border transition-all border-transparent text-slate-400 hover:text-white min-h-[50px]';
         bandFields.classList.remove('hidden');
     } else {
-        tabPengunjung.className = 'flex flex-col items-center justify-center p-3 rounded-lg cursor-pointer border transition-all bg-white/10 border-stage-gold/50 text-white';
-        tabBand.className = 'flex flex-col items-center justify-center p-3 rounded-lg cursor-pointer border transition-all border-transparent text-slate-400 hover:text-white';
+        tabPengunjung.className = 'flex flex-col items-center justify-center p-2.5 sm:p-3 rounded-lg cursor-pointer border transition-all bg-white/10 border-stage-gold/50 text-white min-h-[50px]';
+        tabBand.className = 'flex flex-col items-center justify-center p-2.5 sm:p-3 rounded-lg cursor-pointer border transition-all border-transparent text-slate-400 hover:text-white min-h-[50px]';
         bandFields.classList.add('hidden');
     }
 }

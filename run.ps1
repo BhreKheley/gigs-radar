@@ -28,3 +28,4 @@ Write-Host "[OK] Memulai server Django di http://127.0.0.1:8000/" -ForegroundCol
 Write-Host "[INFO] Tekan CTRL+C untuk menghentikan server." -ForegroundColor Gray
 Write-Host ""
 & $pythonPath manage.py runserver 127.0.0.1:8000
+

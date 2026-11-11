@@ -63,3 +63,4 @@ Pengembangan **Gigs Radar** dieksekusi dengan pendekatan *Agile Scrum* berfokus 
 | SP3-10 | Runner skrip Windows 1-klik (`run.bat`, `run.ps1`, `seed.bat`, `seed.ps1`) | Root folder | **DONE** | Otomatis aktivasi .venv & copy snapshot database |
 | SP3-11 | Automated Test Suite komprehensif: 33 Unit & Integration Tests | `apps/*/tests.py`, `core/tests.py` | **DONE** | **33 test case lulus 100% (0 errors, 0 failures)** |
 | SP3-12 | Konfigurasi Vercel Serverless dengan cold-start database auto-copy | `wsgi.py`, `vercel.json` | **DONE** | Mencegah error 500 basis data kosong di `/tmp` |
+

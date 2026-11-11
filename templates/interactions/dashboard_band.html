@@ -3,12 +3,12 @@
 {% block title %}Dashboard Musisi — {{ band.nama_band }} | Gigs Radar{% endblock %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto space-y-8">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
     <!-- Header with Quick Action -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <span class="text-xs uppercase tracking-widest text-stage-gold font-bold">Pusat Kendali Musisi</span>
-            <h1 class="text-3xl md:text-4xl font-extrabold font-display text-slate-900 dark:text-white">
+            <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold font-display text-slate-900 dark:text-white">
                 Dashboard Band: {{ band.nama_band }}
             </h1>
             <p class="text-xs text-slate-400 mt-1">
@@ -16,65 +16,142 @@
             </p>
         </div>
 
-        <div class="flex items-center gap-2.5">
-            <a href="{% url 'buat_gig' %}" class="btn-stage px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-stage-gold/20">
+        <div class="flex flex-wrap items-center gap-2.5">
+            <a href="{% url 'buat_gig' %}" class="btn-stage flex-1 sm:flex-initial min-h-[44px] px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-stage-gold/20">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                 Jadwalkan Gig Baru
             </a>
-            <a href="{% url 'profil_band' %}" class="px-3.5 py-2.5 rounded-xl text-xs font-bold border border-white/20 hover:border-stage-gold text-slate-300 hover:text-stage-gold transition-all">
+            <a href="{% url 'profil_band' %}" class="flex-1 sm:flex-initial min-h-[44px] px-3.5 py-2.5 rounded-xl text-xs font-bold border border-white/20 hover:border-stage-gold text-slate-300 hover:text-stage-gold transition-all flex items-center justify-center">
                 Edit Profil
             </a>
         </div>
     </div>
 
     <!-- 4 KPI Metrics Bar -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="p-5 rounded-2xl glass-panel border border-white/10 space-y-1">
-            <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Total Penampilan</span>
-            <div class="text-3xl font-extrabold font-display text-slate-100">{{ total_gigs }}</div>
-            <span class="text-[11px] text-slate-500">Panggung di Depok</span>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+        <div class="p-4 sm:p-5 rounded-2xl glass-panel border border-white/10 space-y-1">
+            <span class="text-[11px] sm:text-xs text-slate-400 font-semibold uppercase tracking-wider">Total Penampilan</span>
+            <div class="text-2xl sm:text-3xl font-extrabold font-display text-slate-100">{{ total_gigs }}</div>
+            <span class="text-[10px] sm:text-[11px] text-slate-500 block truncate">Panggung di Depok</span>
         </div>
 
-        <div class="p-5 rounded-2xl glass-panel border border-white/10 space-y-1">
-            <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Total Audiens Hadir</span>
-            <div class="text-3xl font-extrabold font-display text-stage-gold">{{ total_penonton }}</div>
-            <span class="text-[11px] text-slate-500">Check-in fisik terverifikasi</span>
+        <div class="p-4 sm:p-5 rounded-2xl glass-panel border border-white/10 space-y-1">
+            <span class="text-[11px] sm:text-xs text-slate-400 font-semibold uppercase tracking-wider">Total Audiens Hadir</span>
+            <div class="text-2xl sm:text-3xl font-extrabold font-display text-stage-gold">{{ total_penonton }}</div>
+            <span class="text-[10px] sm:text-[11px] text-slate-500 block truncate">Check-in fisik terverifikasi</span>
         </div>
 
-        <div class="p-5 rounded-2xl glass-panel border border-white/10 space-y-1">
-            <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Basis Pengikut</span>
-            <div class="text-3xl font-extrabold font-display text-sky-400">{{ band.followers.count }}</div>
-            <span class="text-[11px] text-slate-500">Akun penonton setia</span>
+        <div class="p-4 sm:p-5 rounded-2xl glass-panel border border-white/10 space-y-1">
+            <span class="text-[11px] sm:text-xs text-slate-400 font-semibold uppercase tracking-wider">Basis Pengikut</span>
+            <div class="text-2xl sm:text-3xl font-extrabold font-display text-sky-400">{{ band.followers.count }}</div>
+            <span class="text-[10px] sm:text-[11px] text-slate-500 block truncate">Akun penonton setia</span>
         </div>
 
-        <div class="p-5 rounded-2xl glass-panel border border-white/10 space-y-1">
-            <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Skor Bayesian</span>
-            <div class="text-3xl font-extrabold font-display text-emerald-400">{{ band.skor_popularitas|floatformat:2 }}</div>
-            <span class="text-[11px] text-slate-500">Algoritma anti-bias DDP1</span>
+        <div class="p-4 sm:p-5 rounded-2xl glass-panel border border-white/10 space-y-1">
+            <span class="text-[11px] sm:text-xs text-slate-400 font-semibold uppercase tracking-wider">Skor Bayesian</span>
+            <div class="text-2xl sm:text-3xl font-extrabold font-display text-emerald-400">{{ band.skor_popularitas|floatformat:2 }}</div>
+            <span class="text-[10px] sm:text-[11px] text-slate-500 block truncate">Algoritma anti-bias DDP1</span>
         </div>
     </div>
 
     <!-- Chart.js Analitik Kehadiran Penonton -->
-    <div class="glass-panel p-6 rounded-2xl border border-white/10 space-y-4">
-        <div class="flex items-center justify-between">
-            <div class="space-y-0.5">
-                <h3 class="text-base font-bold font-display text-slate-100">Tren Kehadiran Fisik Penonton (7 Gig Terakhir)</h3>
-                <p class="text-xs text-slate-400">Jumlah audiens yang sukses check-in via GPS 150m pada tiap acara.</p>
-            </div>
+    <div class="glass-panel p-4 sm:p-6 rounded-2xl border border-white/10 space-y-4">
+        <div class="space-y-0.5">
+            <h3 class="text-sm sm:text-base font-bold font-display text-slate-100">Tren Kehadiran Fisik Penonton (7 Gig Terakhir)</h3>
+            <p class="text-xs text-slate-400">Jumlah audiens yang sukses check-in via GPS 150m pada tiap acara.</p>
         </div>
-        <div class="w-full h-64">
+        <div class="w-full h-52 sm:h-64">
             <canvas id="audienceChart"></canvas>
         </div>
     </div>
 
-    <!-- Active Gigs & Live Management Table -->
+    <!-- Active Gigs & Live Management Table / Cards -->
     <div class="glass-panel rounded-2xl border border-white/10 overflow-hidden space-y-0">
-        <div class="p-5 border-b border-white/10 flex items-center justify-between">
-            <h3 class="text-base font-bold font-display text-slate-100">Daftar Jadwal & Status Panggung Band</h3>
+        <div class="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between">
+            <h3 class="text-sm sm:text-base font-bold font-display text-slate-100">Daftar Jadwal & Status Panggung Band</h3>
             <span class="text-xs text-slate-400 font-medium">{{ gigs.count }} Jadwal Terdaftar</span>
         </div>
 
-        <div class="overflow-x-auto">
+        <!-- 1. Mobile Cards Feed (<md) -->
+        <div class="divide-y divide-white/5 md:hidden">
+            {% for g in gigs %}
+            <div class="p-4 space-y-3 hover:bg-white/[0.02] transition-colors">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="space-y-1 min-w-0">
+                        <a href="{% url 'gig_detail' g.id %}" class="font-bold text-sm text-slate-100 hover:text-stage-gold transition-colors block truncate">
+                            {{ g.judul_acara }}
+                        </a>
+                        <div class="text-xs text-slate-300 flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-stage-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+                            <span class="truncate">{{ g.venue.nama }}</span>
+                        </div>
+                        <div class="text-[11px] text-slate-400">
+                            {{ g.mulai|date:"d M Y" }} • {{ g.mulai|date:"H:i" }} - {{ g.selesai|date:"H:i" }} WIB
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col items-end gap-1.5 flex-shrink-0">
+                        {% if g.sedang_live %}
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-stage-crimson/20 border border-stage-crimson text-stage-crimson animate-pulse">
+                            LIVE
+                        </span>
+                        {% elif g.status_efektif == 'TERJADWAL' %}
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-stage-gold/15 border border-stage-gold/30 text-stage-gold">
+                            Terjadwal
+                        </span>
+                        {% else %}
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-slate-500/15 border border-slate-500/30 text-slate-400">
+                            Selesai
+                        </span>
+                        {% endif %}
+                        <span class="text-[11px] text-slate-400 font-semibold">{{ g.checkins.count }} Hadir</span>
+                    </div>
+                </div>
+
+                <!-- Action Toolbar for Mobile -->
+                <div class="pt-2 border-t border-white/5 flex flex-wrap items-center gap-2">
+                    {% if g.sedang_live %}
+                    {% if not g.sudah_diperpanjang %}
+                    <form action="{% url 'extend_gig' g.id %}" method="post" class="flex-1">
+                        {% csrf_token %}
+                        <input type="hidden" name="aksi" value="perpanjang">
+                        <button type="submit" class="w-full min-h-[42px] px-3 py-2 rounded-xl text-xs font-bold bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/40 transition-colors flex items-center justify-center">
+                            +30 Menit
+                        </button>
+                    </form>
+                    {% endif %}
+
+                    <form action="{% url 'extend_gig' g.id %}" method="post" class="flex-1" onsubmit="return confirm('Akhiri panggung sekarang?')">
+                        {% csrf_token %}
+                        <input type="hidden" name="aksi" value="akhiri">
+                        <button type="submit" class="w-full min-h-[42px] px-3 py-2 rounded-xl text-xs font-bold bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 border border-rose-500/40 transition-colors flex items-center justify-center">
+                            Tutup Gig
+                        </button>
+                    </form>
+                    {% elif g.status_efektif == 'TERJADWAL' %}
+                    <button type="button" onclick="triggerGoLive({{ g.id }}, {{ g.venue.latitude }}, {{ g.venue.longitude }})" class="btn-stage flex-1 min-h-[42px] px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/></svg>
+                        Go Live GPS (150m)
+                    </button>
+                    {% endif %}
+
+                    <a href="{% url 'gig_detail' g.id %}" class="min-h-[42px] px-4 py-2 rounded-xl text-xs font-semibold border border-white/10 hover:border-white/30 text-slate-300 hover:text-white transition-colors flex items-center justify-center">
+                        Detail
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="p-8 text-center text-xs text-slate-500 space-y-2">
+                <div>Belum ada jadwal gig yang Anda terbitkan.</div>
+                <a href="{% url 'buat_gig' %}" class="inline-block btn-stage px-4 py-2.5 rounded-xl text-xs font-bold">
+                    Jadwalkan Gig Pertama Sekarang
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- 2. Desktop Table (>=md) -->
+        <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-left text-sm text-slate-300">
                 <thead class="text-xs uppercase tracking-wider text-slate-400 bg-white/5 border-b border-white/10">
                     <tr>

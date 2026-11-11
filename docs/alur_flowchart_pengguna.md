@@ -103,3 +103,4 @@ graph TD
    Status LIVE dievaluasi secara cerdas saat ada permintaan pembacaan data. Jika gig melewati batas waktu selesai ditambah batas toleransi 30 menit, status otomatis diperbarui menjadi `SELESAI` tanpa ketergantungan cronjob eksternal.
 4. **Pencegahan Spam Venue (50m Deduplication)**:
    Saat musisi menambahkan venue baru, algoritma Bounding-Box dan Haversine mendeteksi apakah telah ada venue lain dalam radius 50 meter. Pengguna diberikan peringatan dan wajib memberikan konfirmasi manual jika venue memang berbeda.
+

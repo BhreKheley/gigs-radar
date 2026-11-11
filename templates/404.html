@@ -3,7 +3,7 @@
 {% block title %}404 — Halaman Tidak Ditemukan | Gigs Radar{% endblock %}
 
 {% block content %}
-<div class="max-w-lg mx-auto py-16 text-center space-y-6">
+<div class="max-w-lg mx-auto px-4 py-12 sm:py-16 text-center space-y-6">
     <div class="relative w-28 h-28 mx-auto flex items-center justify-center">
         <div class="absolute inset-0 rounded-full border-2 border-dashed border-stage-gold/30 animate-spin" style="animation-duration: 20s;"></div>
         <div class="w-20 h-20 rounded-full bg-stage-gold/10 border border-stage-gold/30 flex items-center justify-center text-stage-gold">
@@ -13,20 +13,20 @@
 
     <div class="space-y-2">
         <span class="text-xs font-extrabold uppercase tracking-widest text-stage-crimson">Galat 404 • Sinyal Radar Terputus</span>
-        <h1 class="text-3xl md:text-4xl font-extrabold font-display text-slate-900 dark:text-white">
+        <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold font-display text-slate-900 dark:text-white">
             Panggung Tidak Ditemukan
         </h1>
-        <p class="text-xs md:text-sm text-slate-400 max-w-sm mx-auto leading-relaxed">
+        <p class="text-xs sm:text-sm text-slate-400 max-w-sm mx-auto leading-relaxed">
             Halaman atau gig yang Anda cari mungkin telah berakhir, dihapus, atau koordinat URL tidak tepat.
         </p>
     </div>
 
-    <div class="flex items-center justify-center gap-3 pt-4">
-        <a href="{% url 'radar_index' %}" class="btn-stage px-5 py-2.5 rounded-xl text-xs font-bold shadow-lg shadow-stage-gold/20 flex items-center gap-2">
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
+        <a href="{% url 'radar_index' %}" class="btn-stage w-full sm:w-auto min-h-[44px] px-5 py-2.5 rounded-xl text-xs font-bold shadow-lg shadow-stage-gold/20 flex items-center justify-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
             Kembali ke Peta Radar
         </a>
-        <a href="{% url 'jadwal_list' %}" class="px-4 py-2.5 rounded-xl text-xs font-bold border border-white/20 hover:border-stage-gold text-slate-300 hover:text-stage-gold transition-colors">
+        <a href="{% url 'jadwal_list' %}" class="w-full sm:w-auto min-h-[44px] px-4 py-2.5 rounded-xl text-xs font-bold border border-white/20 hover:border-stage-gold text-slate-300 hover:text-stage-gold transition-colors flex items-center justify-center">
             Lihat Jadwal
         </a>
     </div>

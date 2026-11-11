@@ -25,3 +25,4 @@ copy /Y db.sqlite3 seed.sqlite3
 echo.
 echo [SELESAI] Data demo realistis Depok sukses diperbarui!
 pause
+

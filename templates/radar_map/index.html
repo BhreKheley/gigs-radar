@@ -5,15 +5,13 @@
 
 {% block extra_head %}
 <style>
+    /* Full Viewport Map Height on Mobile & Desktop */
     #map-container {
-        height: calc(100vh - 4rem - 4rem);
-        min-height: 520px;
+        width: 100%;
+        height: 100%;
+        min-height: 100%;
     }
-    @media (min-width: 768px) {
-        #map-container {
-            height: calc(100vh - 4rem);
-        }
-    }
+    
     .pulsing-marker {
         display: flex;
         align-items: center;
@@ -21,10 +19,10 @@
     }
     .pulse-ring {
         position: absolute;
-        width: 32px;
-        height: 32px;
+        width: 36px;
+        height: 36px;
         border-radius: 50%;
-        background-color: rgba(239, 68, 68, 0.4);
+        background-color: rgba(239, 68, 68, 0.45);
         animation: pulseAnimation 2s cubic-bezier(0, 0.2, 0.8, 1) infinite;
     }
     @keyframes pulseAnimation {
@@ -35,42 +33,111 @@
 {% endblock %}
 
 {% block content %}
-<div class="relative w-full flex-1 flex flex-col md:flex-row overflow-hidden">
+<div class="relative w-full flex-1 flex flex-col overflow-hidden">
 
-    <!-- Sidebar: Filter & Live Gigs Feed (Desktop & Drawer Mobile) -->
-    <div class="w-full md:w-96 lg:w-[420px] bg-white/95 dark:bg-[#07080C]/95 border-r border-slate-200/80 dark:border-white/[0.08] backdrop-blur-xl flex flex-col z-20 shrink-0 h-auto md:h-full max-h-[45vh] md:max-h-full overflow-hidden transition-colors">
-        
-        <!-- Filter Controls Header -->
-        <div class="p-4 border-b border-slate-200/80 dark:border-white/[0.08] flex flex-col gap-3">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span id="live-indicator-badge" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
-                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 -ml-4.5"></span>
-                    <h2 class="font-extrabold text-sm text-slate-900 dark:text-white font-display">Radar Gigs Aktif</h2>
+    <!-- Mobile Segmented View Switcher (md:hidden) -->
+    <div class="md:hidden flex items-center justify-between px-3 py-2 bg-white/95 dark:bg-[#07080C]/95 border-b border-slate-200/80 dark:border-white/[0.08] backdrop-blur-xl z-30 shrink-0">
+        <div class="flex items-center gap-1 p-1 rounded-xl bg-slate-100 dark:bg-zinc-900 border border-slate-200/80 dark:border-white/[0.08] w-full">
+            <button id="tab-btn-map" type="button" onclick="switchMobileView('map')" 
+                    class="flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 bg-white dark:bg-white/[0.12] text-slate-900 dark:text-white shadow-sm border border-slate-200/60 dark:border-white/[0.1]">
+                <svg class="w-3.5 h-3.5 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <circle cx="12" cy="12" r="9"/>
+                    <circle cx="12" cy="12" r="3"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v3m0 12v3M3 12h3m12 0h3"/>
+                </svg>
+                <span>Peta Radar</span>
+            </button>
+            <button id="tab-btn-list" type="button" onclick="switchMobileView('list')" 
+                    class="flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-1.5 text-slate-500 dark:text-zinc-400">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                </svg>
+                <span>Daftar Gigs (<span id="mobile-gig-count">0</span>)</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Workspace: Split on Desktop, Tabbed on Mobile -->
+    <div class="flex-1 flex flex-col md:flex-row relative overflow-hidden h-[calc(100dvh-4rem-3rem-4.5rem)] md:h-[calc(100vh-4rem)]">
+
+        <!-- Sidebar: Filter & Live Gigs Feed -->
+        <div id="radar-sidebar" 
+             class="hidden md:flex w-full md:w-96 lg:w-[420px] bg-white/95 dark:bg-[#07080C]/95 border-r border-slate-200/80 dark:border-white/[0.08] backdrop-blur-xl flex-col z-20 shrink-0 h-full overflow-hidden transition-colors">
+            
+            <!-- Filter Controls Header -->
+            <div class="p-4 border-b border-slate-200/80 dark:border-white/[0.08] flex flex-col gap-3 shrink-0">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span id="live-indicator-badge" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 -ml-4.5"></span>
+                        <h2 class="font-extrabold text-sm text-slate-900 dark:text-white font-display">Radar Gigs Aktif</h2>
+                    </div>
+                    <button id="btn-refresh-radar" onclick="loadLiveGigs()" class="p-2 rounded-xl text-slate-500 dark:text-zinc-400 hover:text-amber-500 dark:hover:text-amber-400 bg-slate-100 dark:bg-white/[0.05] border border-slate-200/60 dark:border-white/[0.08] transition" title="Muat Ulang Radar">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                    </button>
                 </div>
-                <button id="btn-refresh-radar" onclick="loadLiveGigs()" class="p-1.5 rounded-lg text-slate-500 dark:text-zinc-400 hover:text-amber-500 dark:hover:text-amber-400 transition" title="Muat Ulang Radar">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+
+                <!-- Radius & Genre Filters -->
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider mb-1">Radius Jarak</label>
+                        <select id="filter-radius" onchange="onFilterChange()" class="w-full px-2.5 py-2 rounded-xl bg-slate-100 dark:bg-white/[0.05] border border-slate-300/80 dark:border-white/[0.1] text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500">
+                            <option value="1">1 km (Sangat Dekat)</option>
+                            <option value="3">3 km (Sekitar Kampus)</option>
+                            <option value="5" selected>5 km (Margonda Raya)</option>
+                            <option value="10">10 km (Kota Depok)</option>
+                            <option value="20">20 km (Jabodetabek)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider mb-1">Aliran Genre</label>
+                        <select id="filter-genre" onchange="onFilterChange()" class="w-full px-2.5 py-2 rounded-xl bg-slate-100 dark:bg-white/[0.05] border border-slate-300/80 dark:border-white/[0.1] text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500">
+                            <option value="">Semua Genre</option>
+                            {% for g in genres_list %}
+                            <option value="{{ g }}">{{ g }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="relative">
+                    <input type="text" id="filter-q" oninput="debounceSearch()" placeholder="Cari band, panggung, atau venue..." 
+                           class="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-100 dark:bg-white/[0.05] border border-slate-300/80 dark:border-white/[0.1] text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-amber-500">
+                    <svg class="w-4 h-4 text-slate-400 dark:text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
-                </button>
+                </div>
             </div>
 
-            <!-- Radius & Genre Filters -->
-            <div class="grid grid-cols-2 gap-2">
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider mb-1">Radius Jarak</label>
-                    <select id="filter-radius" onchange="onFilterChange()" class="w-full px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-white/[0.05] border border-slate-300/80 dark:border-white/[0.1] text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500">
-                        <option value="1">1 km (Sangat Dekat)</option>
-                        <option value="3">3 km (Sekitar Kampus)</option>
-                        <option value="5" selected>5 km (Margonda Raya)</option>
-                        <option value="10">10 km (Kota Depok)</option>
-                        <option value="20">20 km (Jabodetabek)</option>
-                    </select>
+            <!-- Live Gigs List Container -->
+            <div id="gigs-list-container" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
+                <div class="text-center py-12 text-xs text-slate-500 dark:text-zinc-500">
+                    Menyinkronkan data panggung terdekat...
                 </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider mb-1">Aliran Genre</label>
-                    <select id="filter-genre" onchange="onFilterChange()" class="w-full px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-white/[0.05] border border-slate-300/80 dark:border-white/[0.1] text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500">
-                        <option value="">Semua Genre</option>
+            </div>
+        </div>
+
+        <!-- Map Canvas Pane -->
+        <div id="radar-map-pane" class="flex flex-1 relative w-full h-full">
+            <div id="map-container" class="w-full h-full z-10"></div>
+
+            <!-- Floating Top Quick Controls on Map (Mobile & Desktop) -->
+            <div class="absolute top-3 left-3 right-16 z-20 flex items-center gap-2 pointer-events-none md:hidden">
+                <div class="pointer-events-auto bg-white/95 dark:bg-[#0B0C12]/95 border border-slate-200 dark:border-white/10 rounded-2xl shadow-xl px-2.5 py-1.5 backdrop-blur-md flex items-center gap-2 flex-1">
+                    <span class="text-[10px] font-bold text-amber-500 shrink-0">Radar:</span>
+                    <select id="mobile-filter-radius" onchange="syncRadiusFromMobile(this.value)" class="bg-transparent text-xs text-slate-800 dark:text-white font-semibold focus:outline-none shrink-0">
+                        <option value="1">1 km</option>
+                        <option value="3">3 km</option>
+                        <option value="5" selected>5 km</option>
+                        <option value="10">10 km</option>
+                        <option value="20">20 km</option>
+                    </select>
+                    <span class="text-slate-300 dark:text-zinc-700">|</span>
+                    <select id="mobile-filter-genre" onchange="syncGenreFromMobile(this.value)" class="bg-transparent text-xs text-slate-800 dark:text-white font-semibold focus:outline-none truncate flex-1">
+                        <option value="">Semua</option>
                         {% for g in genres_list %}
                         <option value="{{ g }}">{{ g }}</option>
                         {% endfor %}
@@ -78,60 +145,67 @@
                 </div>
             </div>
 
-            <!-- Search Bar -->
-            <div class="relative">
-                <input type="text" id="filter-q" oninput="debounceSearch()" placeholder="Cari band, panggung, atau venue..." 
-                       class="w-full pl-8 pr-3 py-1.5 rounded-xl bg-slate-100 dark:bg-white/[0.05] border border-slate-300/80 dark:border-white/[0.1] text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-amber-500">
-                <svg class="w-3.5 h-3.5 text-slate-400 dark:text-zinc-500 absolute left-2.5 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-            </div>
-        </div>
-
-        <!-- Live Gigs List Container -->
-        <div id="gigs-list-container" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
-            <div class="text-center py-12 text-xs text-slate-500 dark:text-zinc-500">
-                Menyinkronkan data panggung terdekat...
-            </div>
-        </div>
-    </div>
-
-    <!-- Map Canvas -->
-    <div class="flex-1 relative">
-        <div id="map-container" class="w-full h-full z-10"></div>
-
-        <!-- Float Map Center & Locate GPS Button -->
-        <div class="absolute top-4 right-4 z-20 flex flex-col gap-2">
-            <button onclick="getUserGPSLocation()" aria-label="Temukan Lokasi Saya" title="Posisikan GPS Saya"
-                    class="w-10 h-10 rounded-2xl bg-white/95 dark:bg-[#0B0C12]/95 border border-slate-200 dark:border-white/[0.1] shadow-xl backdrop-blur flex items-center justify-center text-slate-700 dark:text-zinc-300 hover:text-amber-500 transition-colors">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="4"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 2v3m0 14v3M2 12h3m14 0h3"/>
-                </svg>
-            </button>
-        </div>
-
-        <!-- DEMO GPS SWITCHER HUD (Active in DEMO_MODE) -->
-        {% if DEMO_MODE %}
-        <div class="absolute bottom-4 left-4 z-20 max-w-xs bg-white/95 dark:bg-[#0B0C12]/95 rounded-2xl p-3 border border-amber-500/30 shadow-2xl backdrop-blur-xl">
-            <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-500 flex items-center gap-1.5">
-                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span>
-                    Demo GPS Simulator
-                </span>
-                <span class="text-[9px] text-slate-500 dark:text-zinc-500">TPA DDP1</span>
-            </div>
-            <p class="text-[11px] text-slate-600 dark:text-zinc-400 mb-2">Simulasikan posisi penonton saat di dalam ruang kelas kampus:</p>
-            <div class="flex flex-wrap gap-1.5">
-                {% for p in presets_demo %}
-                <button type="button" onclick="setDemoLocation({{ p.lat }}, {{ p.lng }}, '{{ p.nama }}')" 
-                        class="px-2 py-1 rounded-lg text-[10px] font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.08] dark:hover:bg-white/[0.15] text-slate-800 dark:text-zinc-200 border border-slate-300/60 dark:border-white/[0.08] transition">
-                    {{ p.nama|truncatechars:18 }}
+            <!-- Float Map Center & Locate GPS Button -->
+            <div class="absolute top-3 right-3 z-20 flex flex-col gap-2">
+                <button type="button" onclick="getUserGPSLocation()" aria-label="Temukan Lokasi Saya" title="Posisikan GPS Saya"
+                        class="w-10 h-10 rounded-2xl bg-white/95 dark:bg-[#0B0C12]/95 border border-slate-200 dark:border-white/[0.1] shadow-xl backdrop-blur flex items-center justify-center text-slate-700 dark:text-zinc-300 hover:text-amber-500 active:scale-95 transition-all">
+                    <svg class="w-5 h-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="4"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 2v3m0 14v3M2 12h3m14 0h3"/>
+                    </svg>
                 </button>
-                {% endfor %}
             </div>
+
+            <!-- DEMO GPS SWITCHER (Collapsible HUD on Mobile) -->
+            {% if DEMO_MODE %}
+            <!-- Demo GPS Toggle Pill -->
+            <div class="absolute bottom-4 left-3 z-20">
+                <button type="button" onclick="toggleDemoGPSModal()" 
+                        class="px-3 py-2 rounded-2xl bg-white/95 dark:bg-[#0B0C12]/95 border border-amber-500/40 shadow-xl backdrop-blur-xl flex items-center gap-2 text-xs font-bold text-amber-500 hover:bg-amber-500/10 active:scale-95 transition-all">
+                    <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+                    <span>Demo GPS Simulator</span>
+                    <svg id="demo-arrow" class="w-3.5 h-3.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>
+                </button>
+
+                <!-- Expanded Locations Sheet -->
+                <div id="demo-gps-popup" class="hidden mt-2 p-3 bg-white/95 dark:bg-[#0B0C12]/95 rounded-2xl border border-amber-500/30 shadow-2xl backdrop-blur-xl max-w-xs space-y-2">
+                    <p class="text-[11px] text-slate-600 dark:text-zinc-400">Pilih titik simulasi di Depok:</p>
+                    <div class="flex flex-wrap gap-1.5">
+                        {% for p in presets_demo %}
+                        <button type="button" onclick="setDemoLocation({{ p.lat }}, {{ p.lng }}, '{{ p.nama }}')" 
+                                class="px-2.5 py-1.5 rounded-lg text-[10px] font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.08] dark:hover:bg-white/[0.15] text-slate-800 dark:text-zinc-200 border border-slate-300/60 dark:border-white/[0.08] transition">
+                            {{ p.nama }}
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Floating Active Gig Preview Card on Map (Mobile Only) -->
+            <div id="mobile-gig-preview" class="hidden absolute bottom-4 right-3 left-3 md:hidden z-20 pointer-events-auto">
+                <div class="glass-panel p-3.5 rounded-2xl border border-amber-500/40 shadow-2xl flex items-center justify-between gap-3">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+                            <span class="text-[10px] font-extrabold text-rose-500 uppercase tracking-widest">LIVE SEKARANG</span>
+                        </div>
+                        <h4 id="preview-band-name" class="font-bold text-sm text-slate-900 dark:text-white truncate mt-0.5">Nama Band</h4>
+                        <p id="preview-venue" class="text-[11px] text-slate-500 dark:text-zinc-400 truncate">Venue • 200m</p>
+                    </div>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button type="button" onclick="closeMobilePreview()" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white" title="Tutup">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                        <a id="preview-link" href="#" class="btn-stage px-3 py-1.5 rounded-xl text-xs font-bold shrink-0">
+                            Buka
+                        </a>
+                    </div>
+                </div>
+            </div>
+
         </div>
-        {% endif %}
+
     </div>
 
 </div>
@@ -144,11 +218,79 @@
     let userMarker = null;
     let radiusCircle = null;
     let gigMarkers = [];
+    let currentMobileView = 'map'; // 'map' or 'list'
     
     // Default: Pusat Margonda / Fasilkom UI Depok
     let currentLat = -6.3645;
     let currentLng = 106.8242;
     let searchTimeout = null;
+
+    // Mobile View Toggle Handler
+    function switchMobileView(view) {
+        currentMobileView = view;
+        const sidebar = document.getElementById('radar-sidebar');
+        const mapPane = document.getElementById('radar-map-pane');
+        const tabMap = document.getElementById('tab-btn-map');
+        const tabList = document.getElementById('tab-btn-list');
+
+        if (view === 'map') {
+            sidebar.classList.add('hidden');
+            sidebar.classList.remove('flex');
+            mapPane.classList.remove('hidden');
+            mapPane.classList.add('flex');
+
+            tabMap.className = 'flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 bg-white dark:bg-white/[0.12] text-slate-900 dark:text-white shadow-sm border border-slate-200/60 dark:border-white/[0.1]';
+            tabList.className = 'flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-1.5 text-slate-500 dark:text-zinc-400';
+
+            // Re-render Leaflet Map dimensions when becoming visible
+            if (map) {
+                setTimeout(() => { map.invalidateSize(); }, 100);
+            }
+        } else {
+            sidebar.classList.remove('hidden');
+            sidebar.classList.add('flex');
+            mapPane.classList.add('hidden');
+            mapPane.classList.remove('flex');
+
+            tabList.className = 'flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 bg-white dark:bg-white/[0.12] text-slate-900 dark:text-white shadow-sm border border-slate-200/60 dark:border-white/[0.1]';
+            tabMap.className = 'flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-1.5 text-slate-500 dark:text-zinc-400';
+        }
+    }
+
+    function syncRadiusFromMobile(val) {
+        document.getElementById('filter-radius').value = val;
+        onFilterChange();
+    }
+
+    function syncGenreFromMobile(val) {
+        document.getElementById('filter-genre').value = val;
+        onFilterChange();
+    }
+
+    function toggleDemoGPSModal() {
+        const popup = document.getElementById('demo-gps-popup');
+        const arrow = document.getElementById('demo-arrow');
+        if (popup) {
+            popup.classList.toggle('hidden');
+            if (arrow) arrow.classList.toggle('rotate-180');
+        }
+    }
+
+    function closeMobilePreview() {
+        const p = document.getElementById('mobile-gig-preview');
+        if (p) p.classList.add('hidden');
+    }
+
+    function showMobileGigPreview(g) {
+        if (window.innerWidth >= 768) return; // Desktop uses popup
+        const p = document.getElementById('mobile-gig-preview');
+        if (p) {
+            document.getElementById('preview-band-name').textContent = g.band_nama;
+            document.getElementById('preview-venue').textContent = `${g.venue_nama} • ${g.jarak_m}m`;
+            document.getElementById('preview-link').href = g.url_detail;
+            p.classList.remove('hidden');
+        }
+    }
 
     function initMap() {
         map = L.map('map-container', {
@@ -165,7 +307,7 @@
             updateMapTile();
         });
 
-        // Polling live gigs every 15 seconds (sesuai DDP1 spek Hal 4)
+        // Polling live gigs every 15 seconds
         setInterval(loadLiveGigs, 15000);
     }
 
@@ -176,16 +318,16 @@
         }
 
         if (isDark) {
-            // Esri Dark Gray Canvas for Obsidian Dark Mode
-            tileLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
-                attribution: '&copy; Esri, HERE, Garmin',
-                maxZoom: 18
+            // CartoDB Dark Matter
+            tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap, &copy; CARTO',
+                maxZoom: 19
             }).addTo(map);
         } else {
-            // OpenStreetMap Standard for Clean Studio Light Mode
-            tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors',
-                maxZoom: 18
+            // CartoDB Voyager
+            tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap, &copy; CARTO',
+                maxZoom: 19
             }).addTo(map);
         }
     }
@@ -219,6 +361,7 @@
         map.setView([lat, lng], 15);
         loadLiveGigs();
         showToast(`Lokasi GPS disimulasikan ke: ${nama}`, 'info');
+        toggleDemoGPSModal();
     }
 
     function updateUserMarker(label) {
@@ -271,7 +414,10 @@
         fetch(url)
             .then(res => res.json())
             .then(data => {
-                renderGigs(data.gigs || []);
+                const gigs = data.gigs || [];
+                renderGigs(gigs);
+                const countElem = document.getElementById('mobile-gig-count');
+                if (countElem) countElem.textContent = gigs.length;
             })
             .catch(err => {
                 console.error("Gagal memuat data live gigs:", err);
@@ -299,11 +445,12 @@
                     <p class="text-xs text-slate-500 dark:text-zinc-400 mt-1">Coba perlebar radius atau ubah filter genre di atas.</p>
                 </div>
             `;
+            closeMobilePreview();
             return;
         }
 
         let html = '';
-        gigs.forEach(g => {
+        gigs.forEach((g, idx) => {
             // Render Map Marker
             const liveMarkerIcon = L.divIcon({
                 className: 'pulsing-marker',
@@ -331,17 +478,26 @@
                     </div>
                 </div>
             `);
+            marker.on('click', () => {
+                showMobileGigPreview(g);
+            });
             gigMarkers.push(marker);
+
+            // On first gig, display mobile preview
+            if (idx === 0) {
+                showMobileGigPreview(g);
+            }
 
             // Render Sidebar Card
             html += `
-                <div class="glass-panel rounded-2xl p-3.5 hover:border-amber-500/40 transition group cursor-pointer" onclick="map.setView([${g.lat}, ${g.lng}], 16)">
+                <div class="glass-panel rounded-2xl p-4 hover:border-amber-500/40 transition group cursor-pointer" 
+                     onclick="focusGigFromList(${g.lat}, ${g.lng})">
                     <div class="flex items-start justify-between gap-2">
                         <div>
                             <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
                                 LIVE NOW
                             </span>
-                            <h3 class="font-bold text-sm text-slate-900 dark:text-white mt-1.5 group-hover:text-amber-500 transition-colors">
+                            <h3 class="font-bold text-base text-slate-900 dark:text-white mt-1.5 group-hover:text-amber-500 transition-colors">
                                 ${g.band_nama}
                             </h3>
                             <div class="text-xs text-slate-500 dark:text-zinc-400 mt-0.5 flex items-center gap-1.5">
@@ -355,18 +511,24 @@
                         </span>
                     </div>
 
-                    <div class="mt-3 pt-2.5 border-t border-slate-200/80 dark:border-white/[0.06] flex items-center justify-between text-xs">
+                    <div class="mt-3.5 pt-3 border-t border-slate-200/80 dark:border-white/[0.06] flex items-center justify-between text-xs">
                         <span class="text-slate-500 dark:text-zinc-400 flex items-center gap-1">
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <svg class="w-3.5 h-3.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <circle cx="12" cy="12" r="9"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 7v5l3 3"/>
                             </svg>
                             <span>${g.sisa_menit} mnt lagi</span>
+                            <span class="text-slate-400 dark:text-zinc-500">(${g.jarak_km} km)</span>
                         </span>
-                        <a href="${g.url_detail}" class="text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1">
-                            <span>Detail &amp; Check-In</span>
-                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-                        </a>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="event.stopPropagation(); viewOnMap(${g.lat}, ${g.lng})" class="md:hidden px-2 py-1 rounded-lg bg-slate-100 dark:bg-white/10 text-[11px] font-bold text-slate-700 dark:text-zinc-300">
+                                Peta
+                            </button>
+                            <a href="${g.url_detail}" onclick="event.stopPropagation()" class="btn-stage px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1">
+                                <span>Detail</span>
+                                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                            </a>
+                        </div>
                     </div>
                 </div>
             `;
@@ -375,7 +537,17 @@
         container.innerHTML = html;
     }
 
+    function focusGigFromList(lat, lng) {
+        map.setView([lat, lng], 16);
+    }
+
+    function viewOnMap(lat, lng) {
+        switchMobileView('map');
+        setTimeout(() => {
+            map.setView([lat, lng], 16);
+        }, 150);
+    }
+
     document.addEventListener('DOMContentLoaded', initMap);
 </script>
 {% endblock %}
-

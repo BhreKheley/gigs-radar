@@ -3,12 +3,12 @@
 {% block title %}Daftar Acara Tersimpan | Gigs Radar{% endblock %}
 
 {% block content %}
-<div class="max-w-5xl mx-auto space-y-8">
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
     <!-- Header -->
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <span class="text-xs uppercase tracking-widest text-stage-gold font-bold">Acara Favorit Anda</span>
-            <h1 class="text-3xl font-extrabold font-display text-slate-900 dark:text-white">
+            <h1 class="text-2xl sm:text-3xl font-extrabold font-display text-slate-900 dark:text-white">
                 Daftar Gig Tersimpan
             </h1>
             <p class="text-xs text-slate-400 mt-1">
@@ -16,7 +16,7 @@
             </p>
         </div>
 
-        <a href="{% url 'jadwal_list' %}" class="btn-stage px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2">
+        <a href="{% url 'jadwal_list' %}" class="btn-stage w-full sm:w-auto min-h-[44px] px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             Jelajahi Jadwal Lainnya
         </a>
@@ -71,19 +71,19 @@
             <!-- Card Actions -->
             <div class="pt-4 border-t border-white/10 flex items-center justify-between gap-2">
                 <div class="flex items-center gap-2">
-                    <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text={{ gig.judul_acara|urlencode }}+-+{{ gig.band.nama_band|urlencode }}&dates={{ gig.mulai|date:'Ymd\THis\Z' }}/{{ gig.selesai|date:'Ymd\THis\Z' }}&details=Saksikan+penampilan+{{ gig.band.nama_band|urlencode }}&location={{ gig.venue.nama|urlencode }}" target="_blank" rel="noopener noreferrer" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-stage-gold border border-white/10 transition-colors" title="Google Calendar">
+                    <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text={{ gig.judul_acara|urlencode }}+-+{{ gig.band.nama_band|urlencode }}&dates={{ gig.mulai|date:'Ymd\THis\Z' }}/{{ gig.selesai|date:'Ymd\THis\Z' }}&details=Saksikan+penampilan+{{ gig.band.nama_band|urlencode }}&location={{ gig.venue.nama|urlencode }}" target="_blank" rel="noopener noreferrer" class="min-w-[44px] min-h-[44px] rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-stage-gold border border-white/10 transition-colors flex items-center justify-center" title="Google Calendar">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                     </a>
-                    <a href="{% url 'export_calendar_ics' gig.id %}" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-stage-gold border border-white/10 transition-colors" title="Unduh .ICS">
+                    <a href="{% url 'export_calendar_ics' gig.id %}" class="min-w-[44px] min-h-[44px] rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-stage-gold border border-white/10 transition-colors flex items-center justify-center" title="Unduh .ICS">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                     </a>
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <button type="button" onclick="removeSaved({{ gig.id }})" class="p-2 rounded-lg text-rose-400 hover:bg-rose-500/10 transition-colors" title="Hapus dari tersimpan">
+                    <button type="button" onclick="removeSaved({{ gig.id }})" class="min-w-[44px] min-h-[44px] rounded-xl text-rose-400 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/30 transition-colors flex items-center justify-center" title="Hapus dari tersimpan">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                     </button>
-                    <a href="{% url 'gig_detail' gig.id %}" class="btn-stage px-3 py-1.5 rounded-lg text-xs font-bold">
+                    <a href="{% url 'gig_detail' gig.id %}" class="btn-stage min-h-[44px] px-4 rounded-xl text-xs font-bold flex items-center justify-center">
                         Buka Gig
                     </a>
                 </div>

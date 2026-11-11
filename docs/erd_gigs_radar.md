@@ -161,3 +161,4 @@ erDiagram
 ### G. Tabel `interactions_savedgig`
 * Relasi: `pengguna_id` ke `auth.User` dan `gig_id` ke `Gig`.
 * Konstrain: `unique_together = ('pengguna', 'gig')`. Mengakomodasi fitur simpan acara sesuai spesifikasi Xplor.in `saved_events`.
+

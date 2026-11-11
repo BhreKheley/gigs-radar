@@ -163,3 +163,4 @@ Di lingkungan Vercel Serverless Function, sistem berkas bersifat *ephemeral* dan
 ## 8. Hak Cipta & Lisensi
 Dikembangkan untuk Tugas Proyek Akhir (TPA) Dasar-Dasar Pemrograman 1 (DDP1), Fakultas Ilmu Komputer, Universitas Indonesia.  
 *Hak Cipta © 2026 Gigs Radar. All rights reserved.*
+

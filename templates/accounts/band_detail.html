@@ -3,7 +3,7 @@
 {% block title %}{{ band.nama_band }} — Profil Musisi | Gigs Radar{% endblock %}
 
 {% block content %}
-<div class="max-w-5xl mx-auto space-y-8">
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 sm:space-y-8">
     <!-- Breadcrumb & Back -->
     <a href="{% url 'jadwal_list' %}" class="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-stage-gold transition-colors">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
@@ -11,16 +11,16 @@
     </a>
 
     <!-- Band Hero Header Card -->
-    <div class="glass-panel p-6 md:p-10 rounded-3xl border border-white/10 relative overflow-hidden shadow-2xl">
+    <div class="glass-panel p-5 sm:p-7 md:p-10 rounded-3xl border border-white/10 relative overflow-hidden shadow-2xl">
         <div class="absolute -right-16 -top-16 w-64 h-64 bg-stage-gold/10 rounded-full blur-3xl pointer-events-none"></div>
 
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
-            <div class="flex flex-col sm:flex-row sm:items-center gap-6">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
                 <!-- Avatar / Logo -->
                 {% if band.foto %}
-                <img src="{{ band.foto.url }}" alt="{{ band.nama_band }}" class="w-24 h-24 rounded-2xl object-cover border-2 border-stage-gold/40 shadow-xl">
+                <img src="{{ band.foto.url }}" alt="{{ band.nama_band }}" class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-2 border-stage-gold/40 shadow-xl flex-shrink-0">
                 {% else %}
-                <div class="w-24 h-24 rounded-2xl bg-gradient-to-tr from-stage-gold/30 to-stage-crimson/30 border-2 border-stage-gold/40 flex items-center justify-center font-display font-extrabold text-3xl text-stage-gold shadow-xl">
+                <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-stage-gold/30 to-stage-crimson/30 border-2 border-stage-gold/40 flex items-center justify-center font-display font-extrabold text-2xl sm:text-3xl text-stage-gold shadow-xl flex-shrink-0">
                     {{ band.nama_band|slice:":2"|upper }}
                 </div>
                 {% endif %}
@@ -39,11 +39,11 @@
                         {% endif %}
                     </div>
 
-                    <h1 class="text-3xl md:text-4xl font-extrabold font-display text-slate-900 dark:text-white">
+                    <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold font-display text-slate-900 dark:text-white">
                         {{ band.nama_band }}
                     </h1>
 
-                    <div class="flex flex-wrap items-center gap-4 text-xs text-slate-400">
+                    <div class="flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-slate-400">
                         <span class="flex items-center gap-1 text-stage-gold font-bold">
                             <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
                             Skor {{ band.skor_popularitas|floatformat:2 }}
@@ -59,19 +59,19 @@
             </div>
 
             <!-- Follow / Unfollow Action Button -->
-            <div class="flex items-center gap-3">
+            <div class="flex items-center w-full sm:w-auto">
                 {% if user.is_authenticated and user.id == band.user_id %}
-                <a href="{% url 'profil_band' %}" class="btn-stage px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2">
+                <a href="{% url 'profil_band' %}" class="btn-stage w-full sm:w-auto min-h-[44px] px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                     Edit Profil Musisi
                 </a>
                 {% elif user.is_authenticated %}
-                <button id="btn-follow" data-following="{{ is_following|lower }}" class="px-5 py-2.5 rounded-xl text-xs font-bold border transition-all flex items-center gap-2 {% if is_following %}bg-white/10 border-white/20 text-slate-200 hover:bg-rose-500/20 hover:text-rose-400 hover:border-rose-500/40{% else %}btn-stage shadow-lg shadow-stage-gold/20{% endif %}">
+                <button id="btn-follow" data-following="{{ is_following|lower }}" class="w-full sm:w-auto min-h-[44px] px-5 py-2.5 rounded-xl text-xs font-bold border transition-all flex items-center justify-center gap-2 {% if is_following %}bg-white/10 border-white/20 text-slate-200 hover:bg-rose-500/20 hover:text-rose-400 hover:border-rose-500/40{% else %}btn-stage shadow-lg shadow-stage-gold/20{% endif %}">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     <span id="follow-label">{% if is_following %}Mengikuti{% else %}Ikuti Musisi{% endif %}</span>
                 </button>
                 {% else %}
-                <a href="{% url 'masuk' %}?next={{ request.path }}" class="btn-stage px-5 py-2.5 rounded-xl text-xs font-bold">
+                <a href="{% url 'masuk' %}?next={{ request.path }}" class="btn-stage w-full sm:w-auto min-h-[44px] px-5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center">
                     Masuk untuk Mengikuti
                 </a>
                 {% endif %}

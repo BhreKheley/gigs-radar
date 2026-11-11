@@ -20,3 +20,4 @@ Write-Host "`n[3/3] Memperbarui file snapshot seed.sqlite3 untuk Vercel..." -For
 Copy-Item -Path "db.sqlite3" -Destination "seed.sqlite3" -Force
 
 Write-Host "`n[SELESAI] Data demo realistis Depok sukses diperbarui!" -ForegroundColor Green
+

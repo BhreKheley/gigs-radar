@@ -133,3 +133,4 @@ class InteractionsTestCase(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertIn('leaderboard', resp.context)
         self.assertIn('podium_top3', resp.context)
+
