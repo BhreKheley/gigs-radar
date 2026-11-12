@@ -68,17 +68,27 @@ def landing_page_view(request):
 
     trending_bands = BandProfile.objects.annotate(
         follower_count=Count('followers')
+    ).order_by('-follower_count')[:6]
+
+    perintis_bands = BandProfile.objects.filter(tipe_musisi='PERINTIS').annotate(
+        follower_count=Count('followers')
+    ).order_by('-follower_count')[:4]
+
+    pewaris_bands = BandProfile.objects.filter(tipe_musisi='PEWARIS').annotate(
+        follower_count=Count('followers')
     ).order_by('-follower_count')[:4]
 
     featured_gigs = Gig.objects.filter(
         status__in=['LIVE', 'TERJADWAL']
-    ).select_related('band', 'venue').order_by('mulai')[:3]
+    ).select_related('band', 'venue').order_by('mulai')[:4]
 
     context = {
         'total_venues': total_venues,
         'total_bands': total_bands,
         'live_gigs_count': live_gigs_count,
         'trending_bands': trending_bands,
+        'perintis_bands': perintis_bands,
+        'pewaris_bands': pewaris_bands,
         'featured_gigs': featured_gigs,
     }
     return render(request, 'radar_map/landing.html', context)
@@ -109,6 +119,7 @@ def api_live(request):
 
     genre_filter = request.GET.get('genre', '').strip()
     q_filter = request.GET.get('q', '').strip()
+    tipe_filter = request.GET.get('tipe', '').strip().upper()
 
     # 1. Bounding-Box SQL Pre-filter
     min_lat, max_lat, min_lon, max_lon = hitung_bounding_box(user_lat, user_lng, radius_km)
@@ -124,6 +135,9 @@ def api_live(request):
 
     if genre_filter:
         gigs_qs = gigs_qs.filter(band__genre__icontains=genre_filter)
+
+    if tipe_filter in ['PERINTIS', 'PEWARIS']:
+        gigs_qs = gigs_qs.filter(band__tipe_musisi=tipe_filter)
 
     if q_filter:
         gigs_qs = gigs_qs.filter(
@@ -150,6 +164,9 @@ def api_live(request):
                 'judul': gig.judul_acara,
                 'band_nama': gig.band.nama_band,
                 'band_slug': gig.band.slug,
+                'tipe_musisi': gig.band.tipe_musisi,
+                'label_tipe': gig.band.label_tipe,
+                'badge_css': gig.band.badge_css,
                 'genre': gig.band.genre,
                 'venue_nama': gig.venue.nama,
                 'venue_alamat': gig.venue.alamat,

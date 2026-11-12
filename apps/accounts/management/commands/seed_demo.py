@@ -42,6 +42,7 @@ class Command(BaseCommand):
                     'username': 'senjamargonda_user',
                     'nama_band': 'Senja Margonda',
                     'slug': 'senja-margonda',
+                    'tipe_musisi': 'PEWARIS',
                     'genre': 'Indie Folk',
                     'deskripsi': 'Kolektif musik indie folk asal Kukusan, Depok. Memadukan petikan gitar akustik dengan lirik bertema senja, kereta rel listrik, dan kehangatan Margonda.',
                     'kontak_ig': 'senjamargonda'
@@ -50,6 +51,7 @@ class Command(BaseCommand):
                     'username': 'distorsifasilkom_user',
                     'nama_band': 'Distorsi Fasilkom',
                     'slug': 'distorsi-fasilkom',
+                    'tipe_musisi': 'PERINTIS',
                     'genre': 'Alt Rock',
                     'deskripsi': 'Grup musik alternatif rock bentukan mahasiswa Ilmu Komputer UI yang bising dan penuh distorsi melodi distopik.',
                     'kontak_ig': 'distorsifasilkom'
@@ -58,6 +60,7 @@ class Command(BaseCommand):
                     'username': 'kuartetjazzui_user',
                     'nama_band': 'Kuartet Jazz UI',
                     'slug': 'kuartet-jazz-ui',
+                    'tipe_musisi': 'PEWARIS',
                     'genre': 'Jazz Fusion',
                     'deskripsi': 'Musisi jazz fusion kampus yang membawakan standar jazz klasik dengan improvisasi modern yang lembut dan menenangkan.',
                     'kontak_ig': 'kuartetjazzui'
@@ -66,6 +69,7 @@ class Command(BaseCommand):
                     'username': 'nadasore_user',
                     'nama_band': 'Nada Sore',
                     'slug': 'nada-sore',
+                    'tipe_musisi': 'PERINTIS',
                     'genre': 'Pop Acoustic',
                     'deskripsi': 'Duo vokal akustik yang menyanyikan lagu-lagu pop syahdu pengiring obrolan sore hari di kedai kopi.',
                     'kontak_ig': 'nadasoremusic'
@@ -74,6 +78,7 @@ class Command(BaseCommand):
                     'username': 'orkesmalamjumat_user',
                     'nama_band': 'Orkes Malam Jumat',
                     'slug': 'orkes-malam-jumat',
+                    'tipe_musisi': 'PEWARIS',
                     'genre': 'Ska/Indie',
                     'deskripsi': 'Band ska brass section berenergi tinggi yang selalu membuat seluruh lantai kafe berdansa ria.',
                     'kontak_ig': 'orkesmalamjumat'
@@ -89,16 +94,22 @@ class Command(BaseCommand):
                 user.set_password('demopass123')
                 user.save()
 
-                band_prof, _ = BandProfile.objects.get_or_create(
+                band_prof, created = BandProfile.objects.get_or_create(
                     user=user,
                     defaults={
                         'nama_band': b['nama_band'],
                         'slug': b['slug'],
+                        'tipe_musisi': b['tipe_musisi'],
                         'genre': b['genre'],
                         'deskripsi': b['deskripsi'],
                         'kontak_ig': b['kontak_ig']
                     }
                 )
+                if not created:
+                    band_prof.tipe_musisi = b['tipe_musisi']
+                    band_prof.nama_band = b['nama_band']
+                    band_prof.genre = b['genre']
+                    band_prof.save()
                 band_objs[b['slug']] = band_prof
 
             # 2. Buat Venue Panggung Margonda & Kampus UI Depok

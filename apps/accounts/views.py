@@ -29,13 +29,15 @@ def daftar_view(request):
                 user = User.objects.create_user(username=username, email=email, password=password)
 
                 if role == 'band':
+                    tipe_musisi = form.cleaned_data.get('tipe_musisi', 'PERINTIS') or 'PERINTIS'
                     BandProfile.objects.create(
                         user=user,
                         nama_band=form.cleaned_data['nama_band'],
+                        tipe_musisi=tipe_musisi,
                         genre=form.cleaned_data.get('genre', 'Indie') or 'Indie',
                         kontak_ig=form.cleaned_data.get('kontak_ig', '')
                     )
-                    messages.success(request, f"Akun Musisi '{form.cleaned_data['nama_band']}' berhasil dibuat! Silakan masuk.")
+                    messages.success(request, f"Akun Musisi '{form.cleaned_data['nama_band']}' ({tipe_musisi.capitalize()}) berhasil dibuat! Silakan masuk.")
                 else:
                     messages.success(request, f"Akun Penonton '{username}' berhasil dibuat! Silakan masuk.")
 

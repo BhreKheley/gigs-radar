@@ -1,0 +1,79 @@
+# ==============================================================================
+# Docker Compose Orchestration — Gigs Radar Self-Hosted Infrastructure
+# ==============================================================================
+
+version: '3.8'
+
+services:
+  # 1. PostgreSQL Database Service
+  db:
+    image: postgres:16-alpine
+    container_name: gigsradar_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-gigsradar_db}
+      POSTGRES_USER: ${POSTGRES_USER:-gigsuser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secure_depok_gigs_password_2026}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-gigsuser} -d ${POSTGRES_DB:-gigsradar_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - gigsradar_net
+
+  # 2. Django Gunicorn Web Application Service
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gigsradar_web
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DEBUG=False
+      - SECRET_KEY=${SECRET_KEY:-django-insecure-prod-gigs-radar-server-key-2026}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1,*}
+      - DATABASE_URL=postgres://${POSTGRES_USER:-gigsuser}:${POSTGRES_PASSWORD:-secure_depok_gigs_password_2026}@db:5432/${POSTGRES_DB:-gigsradar_db}
+      - CSRF_TRUSTED_ORIGINS=${CSRF_TRUSTED_ORIGINS:-http://localhost,http://127.0.0.1}
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    networks:
+      - gigsradar_net
+    expose:
+      - "8000"
+
+  # 3. Nginx Reverse Proxy & Static Accelerator
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: gigsradar_nginx
+    restart: unless-stopped
+    depends_on:
+      - web
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - static_volume:/app/staticfiles:ro
+      - media_volume:/app/media:ro
+    networks:
+      - gigsradar_net
+
+volumes:
+  postgres_data:
+    name: gigsradar_postgres_data
+  static_volume:
+    name: gigsradar_static_volume
+  media_volume:
+    name: gigsradar_media_volume
+
+networks:
+  gigsradar_net:
+    name: gigsradar_network
+    driver: bridge

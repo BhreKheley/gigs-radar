@@ -41,6 +41,7 @@ erDiagram
         int user_id FK,UK "OneToOne ke auth.User"
         string nama_band
         string slug UK
+        string tipe_musisi "Enum: PERINTIS / PEWARIS (Rising vs Heritage)"
         string genre
         text deskripsi
         string kontak_ig

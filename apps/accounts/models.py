@@ -4,9 +4,20 @@ from django.utils.text import slugify
 
 
 class BandProfile(models.Model):
+    TIPE_MUSISI_CHOICES = [
+        ('PERINTIS', 'Musisi Perintis (Rising / Indie Underground)'),
+        ('PEWARIS', 'Musisi Pewaris (Heritage / Resident / Panggung Legenda)'),
+    ]
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='band_profile')
     nama_band = models.CharField(max_length=100, verbose_name="Nama Band")
     slug = models.SlugField(max_length=120, unique=True, blank=True)
+    tipe_musisi = models.CharField(
+        max_length=20,
+        choices=TIPE_MUSISI_CHOICES,
+        default='PERINTIS',
+        verbose_name="Kategori Musisi"
+    )
     genre = models.CharField(max_length=50, default="Indie", verbose_name="Genre Musik")
     deskripsi = models.TextField(blank=True, verbose_name="Deskripsi / Biografi")
     kontak_ig = models.CharField(max_length=100, blank=True, verbose_name="Akun Instagram")
@@ -30,7 +41,25 @@ class BandProfile(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.nama_band
+        return f"{self.nama_band} ({self.get_tipe_musisi_display()})"
+
+    @property
+    def is_perintis(self) -> bool:
+        return self.tipe_musisi == 'PERINTIS'
+
+    @property
+    def is_pewaris(self) -> bool:
+        return self.tipe_musisi == 'PEWARIS'
+
+    @property
+    def label_tipe(self) -> str:
+        return "Musisi Pewaris" if self.is_pewaris else "Musisi Perintis"
+
+    @property
+    def badge_css(self) -> str:
+        if self.is_pewaris:
+            return "bg-amber-500/10 text-amber-500 border-amber-500/30"
+        return "bg-cyan-500/10 text-cyan-400 border-cyan-500/30"
 
     @property
     def rata_rata_rating(self) -> float:

@@ -17,14 +17,14 @@ Gigs Radar memfasilitasi interaksi dua sisi (*two-sided platform*) dalam ekosist
 ```mermaid
 graph TD
     A[Buka Gigs Radar] --> B{Pilih Tampilan}
-    B -->|Landing Page| C[Eksplorasi Value Prop & Trending Bands]
+    B -->|Landing Page| C[Eksplorasi Value Prop, Animasi Scroll GSAP & Dual-Track Skena]
     B -->|Peta Radar| D[Akses Peta Geospasial Leaflet]
     
     D --> E[Izinkan Geolokasi GPS Browser]
     E -->|GPS Aktif| F[Deteksi Koordinat Pengguna]
     E -->|GPS Ditolak| G[Gunakan Preset Titik Demo Depok]
     
-    F --> H[Filter Radius: 1km - 50km & Genre]
+    F --> H[Filter Radius: 1km - 50km, Genre, & Kategori Musisi: Perintis vs Pewaris]
     G --> H
     H --> I[Sistem Hitung Bounding-Box SQL + Haversine km]
     I --> J[Tampilkan Marker Gig LIVE & Kartu Interaktif]
@@ -56,7 +56,7 @@ graph TD
 
 ```mermaid
 graph TD
-    AA[Registrasi Akun Peran: Musisi / Band] --> BB[Lengkapi Profil Panggung: Nama, Genre, Instagram, Foto]
+    AA[Registrasi Akun Peran: Musisi / Band] --> BB[Pilih Kategori: Musisi Perintis atau Pewaris & Lengkapi Profil]
     BB --> CC[Akses Dashboard Band]
     
     CC --> DD{Pilih Operasi Panggung}

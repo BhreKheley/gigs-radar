@@ -71,3 +71,29 @@ class CoreServicesTestCase(TestCase):
         status_expired = evaluasi_status_live(mulai, selesai_lampau, live_mulai_pada=mulai)
         self.assertEqual(status_expired, 'SELESAI')
 
+
+class CoreEnterpriseMiddlewareTestCase(TestCase):
+    def test_health_check_endpoint(self):
+        """Memastikan endpoint /healthz merespons HTTP 200 dan payload sistem valid."""
+        response = self.client.get('/healthz')
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data['status'], 'healthy')
+        self.assertEqual(data['database'], 'ok')
+        self.assertIn('Django', data['framework'])
+        self.assertIn('timestamp', data)
+
+    def test_request_timing_middleware_header(self):
+        """Memastikan header X-Response-Time-ms tersaji pada setiap respons HTTP."""
+        response = self.client.get('/healthz')
+        self.assertIn('X-Response-Time-ms', response.headers)
+        val = float(response.headers['X-Response-Time-ms'])
+        self.assertGreaterEqual(val, 0.0)
+
+    def test_enterprise_security_headers_middleware(self):
+        """Memastikan header keamanan enterprise OWASP tersaji pada respons."""
+        response = self.client.get('/healthz')
+        self.assertEqual(response.headers.get('X-Content-Type-Options'), 'nosniff')
+        self.assertEqual(response.headers.get('Referrer-Policy'), 'strict-origin-when-cross-origin')
+        self.assertIn('geolocation=(self)', response.headers.get('Permissions-Policy', ''))
+

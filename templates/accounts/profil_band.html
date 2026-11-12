@@ -53,6 +53,14 @@
                 {% if form.nama_band.errors %}<p class="text-xs text-stage-crimson">{{ form.nama_band.errors.0 }}</p>{% endif %}
             </div>
 
+            <div class="space-y-1">
+                <label for="{{ form.tipe_musisi.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-slate-300">
+                    Kategori Musisi / Skena <span class="text-stage-crimson">*</span>
+                </label>
+                {{ form.tipe_musisi }}
+                {% if form.tipe_musisi.errors %}<p class="text-xs text-stage-crimson">{{ form.tipe_musisi.errors.0 }}</p>{% endif %}
+            </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="space-y-1">
                     <label for="{{ form.genre.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-slate-300">

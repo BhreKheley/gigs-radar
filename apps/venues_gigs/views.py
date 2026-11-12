@@ -16,6 +16,7 @@ def jadwal_list_view(request):
     genre = request.GET.get('genre', '').strip()
     q = request.GET.get('q', '').strip()
     status_filter = request.GET.get('status', '').strip()
+    tipe_filter = request.GET.get('tipe', '').strip().upper()
 
     gigs = Gig.objects.select_related('band', 'venue').filter(
         status__in=['TERJADWAL', 'LIVE']
@@ -23,6 +24,9 @@ def jadwal_list_view(request):
 
     if genre:
         gigs = gigs.filter(band__genre__icontains=genre)
+
+    if tipe_filter in ['PERINTIS', 'PEWARIS']:
+        gigs = gigs.filter(band__tipe_musisi=tipe_filter)
 
     if q:
         gigs = gigs.filter(
@@ -42,6 +46,7 @@ def jadwal_list_view(request):
         'genre_aktif': genre,
         'q': q,
         'status_aktif': status_filter,
+        'tipe_aktif': tipe_filter,
         'genres_list': set(filter(None, genres_list)),
     }
     return render(request, 'venues_gigs/jadwal_list.html', context)

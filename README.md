@@ -6,8 +6,10 @@
 ![Gigs Radar Banner](https://img.shields.io/badge/Status-Production%20Ready-emerald?style=for-the-badge)
 ![Django 5](https://img.shields.io/badge/Django-5.2.19-092E20?style=for-the-badge&logo=django)
 ![Python 3.14](https://img.shields.io/badge/Python-3.14-3776AB?style=for-the-badge&logo=python)
-![Tests Passing](https://img.shields.io/badge/Tests-33%20Passed-success?style=for-the-badge)
+![Tests Passing](https://img.shields.io/badge/Tests-38%20Passed-success?style=for-the-badge)
 ![UI/UX Standard](https://img.shields.io/badge/Anti--Slop-100%25%20Bespoke%20Vector-amber?style=for-the-badge)
+![GSAP](https://img.shields.io/badge/Desktop%20Motion-GSAP%20ScrollTrigger-88CE02?style=for-the-badge&logo=greensock)
+![Docker Ready](https://img.shields.io/badge/Self--Hosted-Docker%20%26%20Nginx-2496ED?style=for-the-badge&logo=docker)
 
 ---
 
@@ -23,6 +25,17 @@ Aplikasi ini mengatasi problem *information fragmentation* yang dihadapi oleh pe
 
 ## 2. Fitur Unggulan & Adaptasi Xplor.in (STACK 2026)
 
+* **Segmentasi Musisi Perintis & Pewaris (Dual-Track Skena)**:
+  Klasifikasi terstruktur antara **Musisi Perintis** (*Rising / Indie Underground*) yang merintis basis pendengar baru dengan **Musisi Pewaris** (*Heritage / Resident / Panggung Legenda*) yang menjaga kultur panggung legendaris Depok. Dilengkapi badge visual bespoke dan filter pencarian interaktif.
+* **Animasi Interaktif Scroll Desktop (GSAP ScrollTrigger)**:
+  Mengintegrasikan GreenSock ScrollTrigger untuk pengalaman desktop interaktif kelas atas: *Hero Ambient Glow Parallax*, *Dual-Track Lane Reveal*, *Milestone Counter Stagger*, dan *Pilar 3D Depth*. Dioptimalkan dengan media query sehingga mode ponsel tetap ringan dan bebas lag.
+* **Enterprise Middleware & Observabilitas Backend**:
+  - `RequestTimingMiddleware`: Menyematkan header latensi respons `X-Response-Time-ms` dan mendeteksi slow-query (>500ms).
+  - `EnterpriseSecurityHeadersMiddleware`: Hardening header keamanan browser (OWASP standard, nosniff, strict-origin, permissions-policy).
+  - `RateLimitProtectionMiddleware`: Mitigasi brute-force login dan flood request koordinat pada endpoint check-in.
+  - Endpoint diagnostik `/healthz` untuk monitoring kesehatan container dan basis data secara real-time.
+* **Infrastruktur Server Mandiri (Docker & Nginx Ready)**:
+  Dilengkapi konfigurasi Docker Compose multi-stage, database PostgreSQL 16, Nginx reverse proxy dengan caching statis, serta skrip deployment (`scripts/deploy.sh`) dan pencadangan basis data otomatis (`scripts/backup.sh`).
 * **Deterministik Status Live (Lazy State Evaluation)**: Status LIVE dievaluasi secara cerdas pada jendela waktu `[mulai - 30 menit, selesai + 30 menit]`. Tidak bergantung pada cronjob background; basis data diperbarui secara *lazy* saat ada akses request.
 * **Geofence Check-in GPS Presisi ($\le 150\text{ meter}$)**: Menggunakan formula jarak lingkaran besar Haversine dengan kompensasi akurasi sinyal dalam ruangan (*buffer* hingga 50m).
 * **Aturan Integritas Musisi Ketat**:
@@ -45,46 +58,56 @@ Aplikasi ini mengatasi problem *information fragmentation* yang dihadapi oleh pe
 
 ---
 
-## 3. Arsitektur Proyek (Django 5 MVT)
+## 3. Arsitektur Proyek (Django 5 MVT & Self-Hosted)
 
 ```
 TPA DDP1/
 ├── core/                           # Service Layer Matematika Geospasial & Algoritma
 │   ├── services.py                 # Haversine, Bounding Box, Bayesian, Crowd Heat, Status Live
-│   └── tests.py                    # 8 Unit Tests matematika murni
+│   ├── middleware.py               # Enterprise: Request Timing, Security Headers, Rate Limiting
+│   ├── views.py                    # Health check probe (/healthz)
+│   └── tests.py                    # 11 Unit Tests matematika murni & middleware
 ├── apps/
-│   ├── accounts/                   # Modul Otentikasi & Profil Panggung Musisi
-│   │   ├── models.py               # BandProfile (OneToOne ke auth.User, auto-slug)
+│   ├── accounts/                   # Modul Otentikasi & Profil Musisi (Perintis & Pewaris)
+│   │   ├── models.py               # BandProfile (OneToOne, auto-slug, tipe_musisi)
 │   │   ├── views.py                # Daftar, Masuk, Keluar, Edit Profil, Follow Toggle
-│   │   ├── forms.py                # Form registrasi dengan selector peran
-│   │   └── tests.py                # Unit test akun & aturan follow
+│   │   ├── forms.py                # Form registrasi peran & kategori musisi
+│   │   └── tests.py                # 8 Unit test akun & klasifikasi musisi
 │   ├── venues_gigs/                # Modul Panggung, Titik Venue & Penjadwalan Gig
 │   │   ├── models.py               # Venue (Indeks Spasial Lat/Lng) & Gig (Lazy State)
-│   │   ├── views.py                # Jadwal List, Detail Gig, Tambah Venue, Buat Gig, Go-Live GPS
+│   │   ├── views.py                # Jadwal List (Filter Tipe & Genre), Detail Gig, Tambah Venue
 │   │   └── tests.py                # Unit test venue dedup 50m, bentrok jadwal, perpanjang +30m
 │   ├── radar_map/                  # Modul Peta Radar Geospasial & Landing Page
-│   │   ├── views.py                # radar_index (Leaflet), landing_page, api_live (JSON)
+│   │   ├── views.py                # radar_index (Leaflet), landing_page (Perintis/Pewaris), api_live
 │   │   └── tests.py                # Unit test geospasial radius filtering
 │   └── interactions/               # Modul Interaksi Audiens, Check-in, Rating, Kalender
 │       ├── models.py               # Follow, Checkin (150m), Rating (Verified), SavedGig
 │       ├── views.py                # Checkin, Rate, Save, Export .ICS, Leaderboard, Dashboard Band
 │       └── tests.py                # Unit test anti self-checkin, anti self-review, kalender
-├── templates/                      # Antarmuka Pengguna Bespoke (Anti-Slop)
-│   ├── base.html                   # Shell induk, theme switcher, toast notification, bottom bar
+├── templates/                      # Antarmuka Pengguna Bespoke (Anti-Slop & GSAP Motion)
+│   ├── base.html                   # Shell induk, theme switcher, GSAP ScrollTrigger scripts
 │   ├── 404.html & 500.html         # Custom branded error pages
-│   ├── radar_map/                  # landing.html & index.html (Peta Radar)
+│   ├── radar_map/                  # landing.html (Desktop GSAP Parallax) & index.html (Peta Radar)
 │   ├── venues_gigs/                # jadwal_list.html, gig_detail.html, buat_gig.html, tambah_venue.html
 │   ├── accounts/                   # masuk.html, daftar.html, profil_band.html, band_detail.html
 │   └── interactions/               # leaderboard.html, dashboard_band.html, saved_list.html
 ├── docs/                           # Dokumentasi Komprehensif
 │   ├── alur_flowchart_pengguna.md  # Diagram Flowchart Mermaid interaksi pengguna
 │   ├── erd_gigs_radar.md           # Diagram Relasi Entitas 7 Tabel Relasional
-│   └── sprint_backlog_gigs_radar.md# Manajemen Proyek Scrum 3 Sprint
+│   ├── sprint_backlog_gigs_radar.md# Manajemen Proyek Scrum 3 Sprint
+│   └── self_hosted_server_guide.md # Runbook Lengkap Deployment VPS Sendiri & Docker
+├── nginx/                          # Konfigurasi Reverse Proxy Nginx
+│   └── conf.d/default.conf         # Static cache, rate limiting, gzip, proxy gunicorn
+├── scripts/                        # Automasi Operasional Server
+│   ├── deploy.sh                   # 1-Klik Zero-Downtime Deployment
+│   └── backup.sh                   # Backup Terjadwal Otomatis Database
+├── Dockerfile                      # Multi-Stage Build Python 3.12-slim (Non-root user)
+├── docker-compose.yml              # Orkes Web + PostgreSQL 16 + Nginx
+├── .env.production.example         # Template Environment Variabel Produksi
 ├── run.bat & run.ps1               # Skrip 1-Klik Menjalankan Server di Windows
 ├── seed.bat & seed.ps1             # Skrip 1-Klik Reset & Seeding Data Realistis
 ├── seed.sqlite3                    # Snapshot Database Cold-start Vercel (286 KB)
-├── vercel.json                     # Konfigurasi Deployment Serverless Vercel
-└── requirements.txt                # Dependensi Python produksi
+└── requirements.txt                # Dependensi Python produksi (Postgres ready)
 ```
 
 ---
@@ -134,16 +157,16 @@ Untuk mempermudah pengujian oleh Asisten Dosen / Penguji, formulir login telah d
 
 ## 6. Hasil Eksekusi Test Suite (Automated Testing)
 
-Seluruh 33 test case otomatis diuji dan berhasil lulus 100%:
+Seluruh 38 test case otomatis diuji dan berhasil lulus 100%:
 ```powershell
 .venv\Scripts\python.exe manage.py test apps.accounts apps.venues_gigs apps.interactions apps.radar_map core
 ```
 **Output**:
 ```text
 Creating test database for alias 'default'...
-.................................
+......................................
 ----------------------------------------------------------------------
-Ran 33 tests in 2.516s
+Ran 38 tests in 1.903s
 
 OK
 Destroying test database for alias 'default'...

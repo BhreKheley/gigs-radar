@@ -88,6 +88,40 @@ class AccountsTestCase(TestCase):
         self.assertEqual(resp2.json()['following'], False)
         self.assertEqual(self.band.followers.count(), 0)
 
+    def test_tipe_musisi_perintis_dan_pewaris(self):
+        """Memastikan klasifikasi tipe musisi Perintis dan Pewaris berfungsi tepat."""
+        # Default band setUp adalah PERINTIS
+        self.assertTrue(self.band.is_perintis)
+        self.assertFalse(self.band.is_pewaris)
+        self.assertEqual(self.band.label_tipe, "Musisi Perintis")
+        self.assertIn("cyan", self.band.badge_css)
+
+        # Ubah menjadi PEWARIS
+        self.band.tipe_musisi = 'PEWARIS'
+        self.band.save()
+        self.assertTrue(self.band.is_pewaris)
+        self.assertFalse(self.band.is_perintis)
+        self.assertEqual(self.band.label_tipe, "Musisi Pewaris")
+        self.assertIn("amber", self.band.badge_css)
+
+    def test_registrasi_musisi_dengan_tipe_pewaris(self):
+        """Pendaftaran musisi dengan eksplisit memilih tipe PEWARIS."""
+        resp = self.client.post(reverse('daftar'), {
+            'username': 'band_pewaris',
+            'email': 'pewaris@test.com',
+            'password': 'password123',
+            'password_konfirmasi': 'password123',
+            'role': 'band',
+            'nama_band': 'Margonda Heritage Ensemble',
+            'tipe_musisi': 'PEWARIS',
+            'genre': 'Classical/Jazz',
+            'kontak_ig': 'margondaheritage'
+        })
+        self.assertEqual(resp.status_code, 302)
+        user_band = User.objects.get(username='band_pewaris')
+        self.assertEqual(user_band.band_profile.tipe_musisi, 'PEWARIS')
+        self.assertTrue(user_band.band_profile.is_pewaris)
+
     def test_musisi_dilarang_follow_band_sendiri(self):
         """Aturan integritas: Musisi tidak boleh mem-follow profil band miliknya sendiri."""
         self.client.login(username='musisi1', password='password123')

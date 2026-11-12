@@ -34,6 +34,14 @@ class DaftarForm(forms.Form):
         'class': 'w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-white/[0.05] border border-slate-300 dark:border-white/[0.1] text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500',
         'placeholder': 'Contoh: Senja Margonda'
     }))
+    tipe_musisi = forms.ChoiceField(
+        choices=BandProfile.TIPE_MUSISI_CHOICES,
+        required=False,
+        initial='PERINTIS',
+        widget=forms.Select(attrs={
+            'class': 'w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-white/[0.05] border border-slate-300 dark:border-white/[0.1] text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500'
+        })
+    )
     genre = forms.CharField(max_length=50, required=False, widget=forms.TextInput(attrs={
         'class': 'w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-white/[0.05] border border-slate-300 dark:border-white/[0.1] text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500',
         'placeholder': 'Contoh: Indie Folk, Jazz Fusion'
@@ -78,9 +86,10 @@ class MasukForm(forms.Form):
 class BandProfileForm(forms.ModelForm):
     class Meta:
         model = BandProfile
-        fields = ['nama_band', 'genre', 'deskripsi', 'kontak_ig', 'foto']
+        fields = ['nama_band', 'tipe_musisi', 'genre', 'deskripsi', 'kontak_ig', 'foto']
         widgets = {
             'nama_band': forms.TextInput(attrs={'class': 'w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-white/[0.05] border border-slate-300 dark:border-white/[0.1] text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500'}),
+            'tipe_musisi': forms.Select(attrs={'class': 'w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-white/[0.05] border border-slate-300 dark:border-white/[0.1] text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500'}),
             'genre': forms.TextInput(attrs={'class': 'w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-white/[0.05] border border-slate-300 dark:border-white/[0.1] text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500'}),
             'deskripsi': forms.Textarea(attrs={'rows': 4, 'class': 'w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-white/[0.05] border border-slate-300 dark:border-white/[0.1] text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500'}),
             'kontak_ig': forms.TextInput(attrs={'class': 'w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-white/[0.05] border border-slate-300 dark:border-white/[0.1] text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500'}),
